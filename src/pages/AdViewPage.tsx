@@ -1,5 +1,5 @@
 function AdViewPage() {
-    return <div>Список объявлений</div>
+    return <div>Просмотр объявления</div>
 }
 
 export default AdViewPage

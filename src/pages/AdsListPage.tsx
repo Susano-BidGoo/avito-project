@@ -2,7 +2,15 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import photoPlaceholder from '../assets/photo.svg';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+import sectBlackUrl from '../assets/Sect black.svg';
+import sectBlueUrl from '../assets/Sect blue.svg';
+import listBlackUrl from '../assets/List black.svg';
+import listBlueUrl from '../assets/List blue.svg';
+import tickUrl from '../assets/Tick.svg';
+import blankCheckmarkUrl from '../assets/Blank checkmark.svg';
+import requiresImprovementsUrl from '../assets/Requires improvements.svg';
+
+//Types
 
 type Category = 'auto' | 'real_estate' | 'electronics';
 type SortColumn = 'title' | 'createdAt';
@@ -24,10 +32,10 @@ interface ApiResponse {
     total: number;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+//Constants
 
 const CATEGORY_LABELS: Record<Category, string> = {
-    auto: 'Транспорт',
+    auto: 'Авто',
     real_estate: 'Недвижимость',
     electronics: 'Электроника',
 };
@@ -35,6 +43,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
 const ALL_CATEGORIES: Category[] = ['auto', 'real_estate', 'electronics'];
 const PAGE_SIZE = 10;
 const API_BASE = 'http://localhost:8080';
+const LAYOUT_KEY = 'ads_layout';
 
 function formatPrice(price: number): string {
     return new Intl.NumberFormat('ru-RU', {
@@ -44,41 +53,18 @@ function formatPrice(price: number): string {
     }).format(price);
 }
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+//Icons
 
 function SearchIcon() {
     return (
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
-            <path d="M7 12A5 5 0 1 0 7 2a5 5 0 0 0 0 10ZM14 14l-3-3"
-                  stroke="#BFBFBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="#000000D9" strokeWidth="1.4" />
+            <path d="M10.5 10.5L13.5 13.5" stroke="#000000D9" strokeWidth="1.4" strokeLinecap="round" />
         </svg>
     );
 }
 
-function GridIcon({ active }: { active: boolean }) {
-    const c = active ? '#1890FF' : '#8C8C8C';
-    return (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill={c}>
-            <rect x="1" y="1" width="6" height="6" rx="1" />
-            <rect x="9" y="1" width="6" height="6" rx="1" />
-            <rect x="1" y="9" width="6" height="6" rx="1" />
-            <rect x="9" y="9" width="6" height="6" rx="1" />
-        </svg>
-    );
-}
-
-function ListIcon({ active }: { active: boolean }) {
-    const c = active ? '#1890FF' : '#8C8C8C';
-    return (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill={c}>
-            <rect x="1" y="2" width="14" height="2.5" rx="1" />
-            <rect x="1" y="6.75" width="14" height="2.5" rx="1" />
-            <rect x="1" y="11.5" width="14" height="2.5" rx="1" />
-        </svg>
-    );
-}
-
-// ─── Toggle ───────────────────────────────────────────────────────────────────
+//Toggle
 
 function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
     return (
@@ -112,29 +98,21 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
     );
 }
 
-// ─── "Требует доработок" badge ────────────────────────────────────────────────
+//NeedsBadge
 
 function NeedsBadge() {
     return (
-        <span
-            style={{
-                display: 'inline-block',
-                background: '#FAAD14',
-                color: '#fff',
-                borderRadius: 15,
-                padding: '4px 12px',
-                fontSize: 11,
-                fontWeight: 500,
-                lineHeight: '140%',
-                whiteSpace: 'nowrap',
-            }}
-        >
-      Требует доработок
-    </span>
+        <div style={{ width: 'fit-content' }}>
+            <img
+                src={requiresImprovementsUrl}
+                alt="Требует доработок"
+                style={{ display: 'block', height: 25, width: 'auto' }}
+            />
+        </div>
     );
 }
 
-// ─── Filter Block ─────────────────────────────────────────────────────────────
+//Filter Block
 
 interface FilterBlockProps {
     selectedCategories: Category[];
@@ -153,7 +131,6 @@ function FilterBlock({
                      }: FilterBlockProps) {
     return (
         <div style={{ width: 256, flexShrink: 0 }}>
-            {/* White box — 256×247 rx=8 */}
             <div
                 style={{
                     background: '#fff',
@@ -163,7 +140,6 @@ function FilterBlock({
                     width: '100%',
                 }}
             >
-                {/* "Фильтры" title */}
                 <p
                     style={{
                         fontFamily: 'Roboto, sans-serif',
@@ -177,93 +153,80 @@ function FilterBlock({
                     Фильтры
                 </p>
 
-                {/* Category checkboxes */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {ALL_CATEGORIES.map(cat => (
-                        <label
-                            key={cat}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 8,
-                                cursor: 'pointer',
-                                padding: '5px 0',
-                            }}
-                        >
-                            <input
-                                type="checkbox"
-                                checked={selectedCategories.includes(cat)}
-                                onChange={() => onCategoryToggle(cat)}
+                    {ALL_CATEGORIES.map(cat => {
+                        const checked = selectedCategories.includes(cat);
+                        return (
+                            <label
+                                key={cat}
                                 style={{
-                                    width: 16,
-                                    height: 16,
-                                    borderRadius: 2,
-                                    accentColor: '#1890FF',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 8,
                                     cursor: 'pointer',
-                                    flexShrink: 0,
-                                    margin: 0,
+                                    padding: '5px 0',
                                 }}
-                            />
-                            <span
-                                style={{
-                                    fontFamily: 'Roboto, sans-serif',
-                                    fontWeight: 400,
-                                    fontSize: 14,
-                                    lineHeight: '22px',
-                                    color: 'rgba(0,0,0,0.85)',
-                                }}
+                                onClick={() => onCategoryToggle(cat)}
                             >
-                {CATEGORY_LABELS[cat]}
-              </span>
-                        </label>
-                    ))}
+                                <img
+                                    src={checked ? tickUrl : blankCheckmarkUrl}
+                                    alt={checked ? 'checked' : 'unchecked'}
+                                    width={16}
+                                    height={16}
+                                    style={{ flexShrink: 0 }}
+                                />
+                                <span
+                                    style={{
+                                        fontFamily: 'Roboto, sans-serif',
+                                        fontWeight: 400,
+                                        fontSize: 14,
+                                        lineHeight: '22px',
+                                        color: 'rgba(0,0,0,0.85)',
+                                    }}
+                                >
+                                    {CATEGORY_LABELS[cat]}
+                                </span>
+                            </label>
+                        );
+                    })}
                 </div>
 
-                {/* Divider */}
                 <div style={{ height: 1, background: '#F0F0F0', margin: '12px 0' }} />
 
-                {/* Toggle row */}
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: 8,
-                    }}
-                >
-          <span
-              style={{
-                  fontFamily: 'Roboto, sans-serif',
-                  fontWeight: 600,
-                  fontSize: 12,
-                  lineHeight: '140%',
-                  color: 'rgba(0,0,0,0.85)',
-              }}
-          >
-            Только требующие доработок
-          </span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <span
+                        style={{
+                            fontFamily: 'Roboto, sans-serif',
+                            fontWeight: 600,
+                            fontSize: 12,
+                            lineHeight: '140%',
+                            color: 'rgba(0,0,0,0.85)',
+                        }}
+                    >
+                        Только требующие доработок
+                    </span>
                     <Toggle on={onlyNeedsRevision} onChange={onNeedsRevisionToggle} />
                 </div>
             </div>
 
-            {/* "Сбросить фильтры" — below the white box */}
             <button
                 onClick={onReset}
                 style={{
                     display: 'block',
-                    background: 'none',
+                    width: '100%',
+                    marginTop: 8,
+                    background: '#fff',
                     border: 'none',
-                    padding: 0,
-                    marginTop: 12,
+                    borderRadius: 8,
+                    padding: '10px 16px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
                     fontFamily: 'Inter, sans-serif',
                     fontWeight: 400,
                     fontSize: 14,
                     lineHeight: '100%',
                     color: '#848388',
-                    cursor: 'pointer',
-                    width: 130,
-                    height: 17,
-                    textAlign: 'left',
+                    boxSizing: 'border-box',
                 }}
             >
                 Сбросить фильтры
@@ -272,7 +235,7 @@ function FilterBlock({
     );
 }
 
-// ─── Search Bar ───────────────────────────────────────────────────────────────
+//Search Bar
 
 interface SearchBarProps {
     search: string;
@@ -298,7 +261,6 @@ function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, on
                 boxSizing: 'border-box',
             }}
         >
-            {/* Search input with grey bg */}
             <div
                 style={{
                     flex: 1,
@@ -312,7 +274,6 @@ function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, on
                     minWidth: 0,
                 }}
             >
-                <SearchIcon />
                 <input
                     value={search}
                     onChange={e => onSearchChange(e.target.value)}
@@ -330,12 +291,49 @@ function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, on
                         minWidth: 0,
                     }}
                 />
+                <SearchIcon />
             </div>
 
-            {/* Separator */}
             <div style={{ width: 1, height: 24, background: '#F0F0F0', flexShrink: 0 }} />
 
-            {/* Sort */}
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: '#F5F5F5',
+                    borderRadius: 8,
+                    padding: '4px',
+                    gap: 2,
+                    flexShrink: 0,
+                }}
+            >
+                <button
+                    onClick={() => onLayoutChange('grid')}
+                    style={{
+                        width: 32, height: 32, border: 'none', borderRadius: 6,
+                        background: 'transparent', display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', cursor: 'pointer', padding: 0,
+                    }}
+                    title="Сетка"
+                >
+                    <img src={layout === 'grid' ? sectBlueUrl : sectBlackUrl} alt="grid" width={16} height={16} />
+                </button>
+                <div style={{ width: 1, height: 16, background: '#D9D9D9' }} />
+                <button
+                    onClick={() => onLayoutChange('list')}
+                    style={{
+                        width: 32, height: 32, border: 'none', borderRadius: 6,
+                        background: 'transparent', display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', cursor: 'pointer', padding: 0,
+                    }}
+                    title="Список"
+                >
+                    <img src={layout === 'list' ? listBlueUrl : listBlackUrl} alt="list" width={16} height={16} />
+                </button>
+            </div>
+
+            <div style={{ width: 1, height: 24, background: '#F0F0F0', flexShrink: 0 }} />
+
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                 <select
                     value={sortValue}
@@ -343,65 +341,39 @@ function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, on
                     style={{
                         appearance: 'none',
                         WebkitAppearance: 'none',
-                        border: 'none',
-                        background: 'transparent',
+                        background: '#FFFFFF',
+                        border: '4px solid #F4F4F6',
+                        borderRadius: 8,
+                        boxShadow: '0px 2px 0px rgba(0,0,0,0.016)',
                         outline: 'none',
                         fontFamily: 'Roboto, sans-serif',
                         fontWeight: 400,
                         fontSize: 14,
                         color: 'rgba(0,0,0,0.85)',
-                        paddingRight: 18,
+                        padding: '4px 36px 4px 16px',
                         cursor: 'pointer',
+                        lineHeight: 'normal',
                     }}
                 >
-                    <option value="createdAt_desc">Сначала новые</option>
-                    <option value="createdAt_asc">Сначала старые</option>
-                    <option value="title_asc">Название А → Я</option>
-                    <option value="title_desc">Название Я → А</option>
-                    <option value="price_asc">Сначала дешевле</option>
-                    <option value="price_desc">Сначала дороже</option>
+                    <option value="createdAt_desc">По новизне (сначала новые)</option>
+                    <option value="createdAt_asc">По новизне (сначала старые)</option>
+                    <option value="title_asc">По названию (А → Я)</option>
+                    <option value="title_desc">По названию (Я → А)</option>
+                    <option value="price_asc">По цене (сначала дешевле)</option>
+                    <option value="price_desc">По цене (сначала дороже)</option>
                 </select>
                 <svg
                     width="12" height="12" viewBox="0 0 12 12" fill="none"
-                    style={{ position: 'absolute', right: 0, pointerEvents: 'none' }}
+                    style={{ position: 'absolute', right: 12, pointerEvents: 'none' }}
                 >
                     <path d="M2 4l4 4 4-4" stroke="rgba(0,0,0,0.45)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-            </div>
-
-            {/* Separator */}
-            <div style={{ width: 1, height: 24, background: '#F0F0F0', flexShrink: 0 }} />
-
-            {/* Layout buttons */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                <button
-                    onClick={() => onLayoutChange('grid')}
-                    style={{
-                        width: 32, height: 32, border: 'none', borderRadius: 4,
-                        background: layout === 'grid' ? '#E6F7FF' : 'transparent',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer',
-                    }}
-                >
-                    <GridIcon active={layout === 'grid'} />
-                </button>
-                <button
-                    onClick={() => onLayoutChange('list')}
-                    style={{
-                        width: 32, height: 32, border: 'none', borderRadius: 4,
-                        background: layout === 'list' ? '#E6F7FF' : 'transparent',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer',
-                    }}
-                >
-                    <ListIcon active={layout === 'list'} />
-                </button>
             </div>
         </div>
     );
 }
 
-// ─── Cards ────────────────────────────────────────────────────────────────────
+//Ad Card (Grid)
 
 function AdCardGrid({ item, onClick }: { item: AdItem; onClick: () => void }) {
     return (
@@ -414,30 +386,55 @@ function AdCardGrid({ item, onClick }: { item: AdItem; onClick: () => void }) {
                 cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
+                position: 'relative',
             }}
         >
-            <div style={{ width: '100%', aspectRatio: '4/3', background: '#FAFAFA', overflow: 'hidden' }}>
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#fff' }}>
                 <img
                     src={item.imageUrl ?? photoPlaceholder}
                     alt={item.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                 />
-            </div>
-            <div style={{ padding: '12px 16px 16px' }}>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'rgba(0,0,0,0.85)', margin: '0 0 2px' }}>
+                <div
+                    style={{
+                        position: 'absolute',
+                        bottom: -14,
+                        left: 16,
+                        background: '#fff',
+                        border: '1px solid #D9D9D9',
+                        borderRadius: 20,
+                        padding: '2px 10px',
+                        fontFamily: 'Roboto, sans-serif',
+                        fontWeight: 400,
+                        fontSize: 14,
+                        lineHeight: '22px',
+                        color: 'rgba(0,0,0,0.85)',
+                        whiteSpace: 'nowrap',
+                    }}
+                >
                     {CATEGORY_LABELS[item.category]}
-                </p>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: 'rgba(0,0,0,0.85)', margin: '0 0 2px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                </div>
+            </div>
+
+            <div style={{ padding: '22px 16px 48px', display: 'flex', flexDirection: 'column', flex: 1, gap: 4 }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: 'rgba(0,0,0,0.85)', margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                     {item.title}
                 </p>
                 <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 14, lineHeight: '140%', color: 'rgba(0,0,0,0.45)', margin: 0 }}>
                     {formatPrice(item.price)}
                 </p>
-                {item.needsRevision && <div style={{ marginTop: 8 }}><NeedsBadge /></div>}
             </div>
+
+            {item.needsRevision && (
+                <div style={{ position: 'absolute', bottom: 12, left: 16 }}>
+                    <NeedsBadge />
+                </div>
+            )}
         </div>
     );
 }
+
+//Ad Card (List)
 
 function AdCardList({ item, onClick }: { item: AdItem; onClick: () => void }) {
     return (
@@ -449,35 +446,39 @@ function AdCardList({ item, onClick }: { item: AdItem; onClick: () => void }) {
                 overflow: 'hidden',
                 cursor: 'pointer',
                 display: 'flex',
-                alignItems: 'center',
-                gap: 16,
-                padding: '12px 16px',
+                alignItems: 'stretch',
+                position: 'relative',
             }}
         >
-            <div style={{ width: 80, height: 60, borderRadius: 8, background: '#FAFAFA', overflow: 'hidden', flexShrink: 0 }}>
+            <div style={{ width: 179, flexShrink: 0, background: '#fff' }}>
                 <img
                     src={item.imageUrl ?? photoPlaceholder}
                     alt={item.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                 />
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'rgba(0,0,0,0.85)', margin: '0 0 1px' }}>
+            <div style={{ flex: 1, minWidth: 0, padding: '12px 16px 40px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'rgba(0,0,0,0.45)', margin: 0 }}>
                     {CATEGORY_LABELS[item.category]}
                 </p>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: 'rgba(0,0,0,0.85)', margin: '0 0 1px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: 'rgba(0,0,0,0.85)', margin: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
                     {item.title}
                 </p>
                 <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 14, lineHeight: '140%', color: 'rgba(0,0,0,0.45)', margin: 0 }}>
                     {formatPrice(item.price)}
                 </p>
             </div>
-            {item.needsRevision && <NeedsBadge />}
+
+            {item.needsRevision && (
+                <div style={{ position: 'absolute', bottom: 12, left: 195 }}>
+                    <NeedsBadge />
+                </div>
+            )}
         </div>
     );
 }
 
-// ─── Pagination ───────────────────────────────────────────────────────────────
+//Pagination
 
 function Pagination({ current, total, onChange }: { current: number; total: number; onChange: (p: number) => void }) {
     if (total <= 1) return null;
@@ -486,23 +487,20 @@ function Pagination({ current, total, onChange }: { current: number; total: numb
         width: 32, height: 32, borderRadius: 8, background: '#fff',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         cursor: 'pointer', fontFamily: 'Roboto, sans-serif',
-        fontSize: 14, boxSizing: 'border-box',
+        fontSize: 14, boxSizing: 'border-box', flexShrink: 0,
     };
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 24 }}>
-            {/* Prev */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 8, marginTop: 24 }}>
             <button
                 onClick={() => current > 1 && onChange(current - 1)}
                 disabled={current <= 1}
                 style={{ ...base, border: '1px solid #D9D9D9', opacity: current <= 1 ? 0.4 : 1, cursor: current <= 1 ? 'default' : 'pointer' }}
             >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M7.5 9.5L4 6l3.5-3.5" stroke="#D9D9D9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M7.5 9.5L4 6l3.5-3.5" stroke="rgba(0,0,0,0.85)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
             </button>
-
-            {/* Pages */}
             {Array.from({ length: total }, (_, i) => i + 1).map(p => (
                 <button
                     key={p}
@@ -517,8 +515,6 @@ function Pagination({ current, total, onChange }: { current: number; total: numb
                     {p}
                 </button>
             ))}
-
-            {/* Next */}
             <button
                 onClick={() => current < total && onChange(current + 1)}
                 disabled={current >= total}
@@ -532,7 +528,7 @@ function Pagination({ current, total, onChange }: { current: number; total: numb
     );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+//Page
 
 export default function AdsListPage() {
     const navigate = useNavigate();
@@ -540,7 +536,7 @@ export default function AdsListPage() {
 
     const [items, setItems] = useState<AdItem[]>([]);
     const [total, setTotal] = useState(0);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     const [search, setSearch] = useState(searchParams.get('q') ?? '');
@@ -549,25 +545,43 @@ export default function AdsListPage() {
     const [priceSortDir, setPriceSortDir] = useState<'asc' | 'desc' | null>(null);
     const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
     const [onlyNeedsRevision, setOnlyNeedsRevision] = useState(false);
-    const [layout, setLayout] = useState<Layout>('grid');
     const [page, setPage] = useState(1);
+
+    const [layout, setLayout] = useState<Layout>(() => {
+        const saved = localStorage.getItem(LAYOUT_KEY);
+        return (saved === 'grid' || saved === 'list') ? saved : 'grid';
+    });
+
+    const handleLayoutChange = (l: Layout) => {
+        setLayout(l);
+        localStorage.setItem(LAYOUT_KEY, l);
+    };
 
     const abortRef = useRef<AbortController | null>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const fetchItems = useCallback(async (opts: {
-        q: string; sortCol: SortColumn; sortDir: SortDirection;
-        categories: Category[]; needsRevision: boolean; page: number;
+        q: string;
+        sortCol: SortColumn;
+        sortDir: SortDirection;
+        categories: Category[];
+        needsRevision: boolean;
+        page: number;
+        priceSort: 'asc' | 'desc' | null;
     }) => {
         abortRef.current?.abort();
         abortRef.current = new AbortController();
-        setLoading(true);
         setError(null);
 
         const params = new URLSearchParams();
         if (opts.q) params.set('q', opts.q);
-        params.set('limit', String(PAGE_SIZE));
-        params.set('skip', String((opts.page - 1) * PAGE_SIZE));
+        if (opts.priceSort) {
+            params.set('limit', '9999');
+            params.set('skip', '0');
+        } else {
+            params.set('limit', String(PAGE_SIZE));
+            params.set('skip', String((opts.page - 1) * PAGE_SIZE));
+        }
         params.set('sortColumn', opts.sortCol);
         params.set('sortDirection', opts.sortDir);
         if (opts.needsRevision) params.set('needsRevision', 'true');
@@ -589,12 +603,23 @@ export default function AdsListPage() {
     }, []);
 
     useEffect(() => {
+        // Показываем загрузку сразу — до того как сработает debounce
+        setLoading(true);
+
         if (timerRef.current) clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
-            fetchItems({ q: search, sortCol: sortColumn, sortDir: sortDirection, categories: selectedCategories, needsRevision: onlyNeedsRevision, page });
+            fetchItems({
+                q: search,
+                sortCol: sortColumn,
+                sortDir: sortDirection,
+                categories: selectedCategories,
+                needsRevision: onlyNeedsRevision,
+                page,
+                priceSort: priceSortDir,
+            });
         }, 300);
         return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-    }, [search, sortColumn, sortDirection, selectedCategories, onlyNeedsRevision, page, fetchItems]);
+    }, [search, sortColumn, sortDirection, priceSortDir, selectedCategories, onlyNeedsRevision, page, fetchItems]);
 
     useEffect(() => {
         const p: Record<string, string> = {};
@@ -608,102 +633,130 @@ export default function AdsListPage() {
     const handleSortChange = (value: string) => {
         if (value.startsWith('price_')) {
             setPriceSortDir(value === 'price_asc' ? 'asc' : 'desc');
+            setSortColumn('createdAt');
+            setSortDirection('desc');
         } else {
             setPriceSortDir(null);
-            const [col, dir] = value.split('_');
-            setSortColumn(col as SortColumn);
-            setSortDirection(dir as SortDirection);
+            const lastUnderscore = value.lastIndexOf('_');
+            const col = value.slice(0, lastUnderscore) as SortColumn;
+            const dir = value.slice(lastUnderscore + 1) as SortDirection;
+            setSortColumn(col);
+            setSortDirection(dir);
         }
         setPage(1);
     };
 
     const handleCategoryToggle = (cat: Category) => {
-        setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+        setSelectedCategories(prev =>
+            prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+        );
         setPage(1);
     };
 
     const handleReset = () => {
-        setSearch(''); setSelectedCategories([]); setOnlyNeedsRevision(false);
-        setPriceSortDir(null); setSortColumn('createdAt'); setSortDirection('desc'); setPage(1);
+        setSearch('');
+        setSelectedCategories([]);
+        setOnlyNeedsRevision(false);
+        setSortColumn('createdAt');
+        setSortDirection('desc');
+        setPriceSortDir(null);
+        setPage(1);
     };
 
-    const displayItems = priceSortDir
+    const currentSortValue = priceSortDir ? `price_${priceSortDir}` : `${sortColumn}_${sortDirection}`;
+
+    const allSorted = priceSortDir
         ? [...items].sort((a, b) => priceSortDir === 'asc' ? a.price - b.price : b.price - a.price)
         : items;
-
-    const currentSortValue = priceSortDir ? `price_${priceSortDir}` : `${sortColumn}_${sortDirection}`;
-    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const displayItems = priceSortDir
+        ? allSorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+        : allSorted;
+    const totalPages = priceSortDir
+        ? Math.max(1, Math.ceil(items.length / PAGE_SIZE))
+        : Math.max(1, Math.ceil(total / PAGE_SIZE));
 
     return (
         <div
             style={{
                 minHeight: '100vh',
                 background: '#F7F5F8',
-                padding: '24px 42px 40px',
                 boxSizing: 'border-box',
                 fontFamily: 'Roboto, sans-serif',
             }}
         >
-            {/* Title */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 16 }}>
-                <h1 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 24, lineHeight: '32px', color: 'rgba(0,0,0,0.85)', margin: 0 }}>
-                    Мои объявления
-                </h1>
-                {!loading && total > 0 && (
-                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: 'rgba(0,0,0,0.45)' }}>
-            {total}
-          </span>
-                )}
-            </div>
+            <div
+                style={{
+                    maxWidth: 1440,
+                    minWidth: 1024,
+                    margin: '0 auto',
+                    padding: '24px 42px 40px',
+                    boxSizing: 'border-box',
+                }}
+            >
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 16 }}>
+                    <h1 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 24, lineHeight: '32px', color: 'rgba(0,0,0,0.85)', margin: 0 }}>
+                        Мои объявления
+                    </h1>
+                    {!loading && total > 0 && (
+                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: 'rgba(0,0,0,0.45)' }}>
+                            {total}
+                        </span>
+                    )}
+                </div>
 
-            {/* Search bar — full width */}
-            <SearchBar
-                search={search}
-                onSearchChange={v => { setSearch(v); setPage(1); }}
-                sortValue={currentSortValue}
-                onSortChange={handleSortChange}
-                layout={layout}
-                onLayoutChange={setLayout}
-            />
-
-            {/* Filter + Cards */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24 }}>
-                <FilterBlock
-                    selectedCategories={selectedCategories}
-                    onCategoryToggle={handleCategoryToggle}
-                    onlyNeedsRevision={onlyNeedsRevision}
-                    onNeedsRevisionToggle={v => { setOnlyNeedsRevision(v); setPage(1); }}
-                    onReset={handleReset}
+                <SearchBar
+                    search={search}
+                    onSearchChange={v => { setSearch(v); setPage(1); }}
+                    sortValue={currentSortValue}
+                    onSortChange={handleSortChange}
+                    layout={layout}
+                    onLayoutChange={handleLayoutChange}
                 />
 
-                <div style={{ flex: 1, minWidth: 0 }}>
-                    {loading && (
-                        <p style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(0,0,0,0.45)', fontSize: 14 }}>Загрузка...</p>
-                    )}
-                    {error && !loading && (
-                        <p style={{ textAlign: 'center', padding: '60px 0', color: '#ff4d4f', fontSize: 14 }}>{error}</p>
-                    )}
-                    {!loading && !error && displayItems.length === 0 && (
-                        <p style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(0,0,0,0.45)', fontSize: 14 }}>Объявления не найдены</p>
-                    )}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24 }}>
+                    <FilterBlock
+                        selectedCategories={selectedCategories}
+                        onCategoryToggle={handleCategoryToggle}
+                        onlyNeedsRevision={onlyNeedsRevision}
+                        onNeedsRevisionToggle={v => { setOnlyNeedsRevision(v); setPage(1); }}
+                        onReset={handleReset}
+                    />
 
-                    {!loading && !error && displayItems.length > 0 && layout === 'grid' && (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: 16 }}>
-                            {displayItems.map(item => (
-                                <AdCardGrid key={item.id} item={item} onClick={() => navigate(`/ads/${item.id}`)} />
-                            ))}
-                        </div>
-                    )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        {loading && (
+                            <p style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(0,0,0,0.45)', fontSize: 14 }}>Загрузка...</p>
+                        )}
+                        {error && !loading && (
+                            <p style={{ textAlign: 'center', padding: '60px 0', color: '#ff4d4f', fontSize: 14 }}>{error}</p>
+                        )}
+                        {!loading && !error && displayItems.length === 0 && (
+                            <p style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(0,0,0,0.45)', fontSize: 14 }}>Объявления не найдены</p>
+                        )}
 
-                    {!loading && !error && displayItems.length > 0 && layout === 'list' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            {displayItems.map(item => (
-                                <AdCardList key={item.id} item={item} onClick={() => navigate(`/ads/${item.id}`)} />
-                            ))}
-                        </div>
-                    )}
+                        {!loading && !error && displayItems.length > 0 && layout === 'grid' && (
+                            <div
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                                    gap: 16,
+                                }}
+                            >
+                                {displayItems.map(item => (
+                                    <AdCardGrid key={item.id} item={item} onClick={() => navigate(`/ads/${item.id}`)} />
+                                ))}
+                            </div>
+                        )}
 
-                    {!loading && !error && <Pagination current={page} total={totalPages} onChange={setPage} />}
+                        {!loading && !error && displayItems.length > 0 && layout === 'list' && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                {displayItems.map(item => (
+                                    <AdCardList key={item.id} item={item} onClick={() => navigate(`/ads/${item.id}`)} />
+                                ))}
+                            </div>
+                        )}
+
+                        {!loading && !error && <Pagination current={page} total={totalPages} onChange={setPage} />}
+                    </div>
                 </div>
             </div>
         </div>

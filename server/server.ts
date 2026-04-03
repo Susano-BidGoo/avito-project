@@ -163,7 +163,7 @@ fastify.put<ItemUpdateRequest>('/items/:id', (request, reply) => {
   }
 });
 
-const port = Number(process.env.port) ?? 8080;
+const port = Number(process.env.PORT) || 8080;
 
 fastify.listen({ port }, function (err, _address) {
   if (err) {

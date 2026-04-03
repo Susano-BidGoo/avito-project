@@ -1,5 +1,5 @@
 function AdEditPage() {
-    return <div>Список объявлений</div>
+    return <div>Редактирование объявления</div>
 }
 
 export default AdEditPage
