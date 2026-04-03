@@ -46,11 +46,7 @@ const API_BASE = 'http://localhost:8080';
 const LAYOUT_KEY = 'ads_layout';
 
 function formatPrice(price: number): string {
-    return new Intl.NumberFormat('ru-RU', {
-        style: 'currency',
-        currency: 'RUB',
-        maximumFractionDigits: 0,
-    }).format(price);
+    return `${price} ₽`
 }
 
 //Icons
@@ -219,7 +215,7 @@ function FilterBlock({
                     border: 'none',
                     borderRadius: 8,
                     padding: '10px 16px',
-                    textAlign: 'left',
+                    textAlign: 'center',
                     cursor: 'pointer',
                     fontFamily: 'Inter, sans-serif',
                     fontWeight: 400,
