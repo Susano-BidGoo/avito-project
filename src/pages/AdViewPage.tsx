@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/theme';
+import { ThemeToggle } from '../components/ThemeToggle';
 import photoPlaceholder from '../assets/photo view.svg';
 import warningIcon from '../assets/Warning sign.svg';
 import editIconUrl from '../assets/Edit icon.svg';
@@ -127,7 +129,7 @@ function getMissingFields(item: AdItem): string[] {
 
 //Characteristics
 
-function CharacteristicsBlock({ item }: { item: AdItem }) {
+function CharacteristicsBlock({ item, isDark }: { item: AdItem; isDark: boolean }) {
     const rows: { label: string; value: string }[] = [];
 
     rows.push({ label: 'Категория', value: CATEGORY_LABELS[item.category] });
@@ -162,7 +164,7 @@ function CharacteristicsBlock({ item }: { item: AdItem }) {
                 fontWeight: 700,
                 fontSize: 18,
                 lineHeight: '28px',
-                color: 'rgba(0,0,0,0.85)',
+                color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
                 margin: '0 0 12px 0',
             }}>
                 Характеристики
@@ -177,7 +179,7 @@ function CharacteristicsBlock({ item }: { item: AdItem }) {
                             fontWeight: 600,
                             fontSize: 14,
                             lineHeight: '140%',
-                            color: 'rgba(0,0,0,0.45)',
+                            color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)',
                         }}>
                             {row.label}
                         </span>
@@ -186,7 +188,7 @@ function CharacteristicsBlock({ item }: { item: AdItem }) {
                             fontWeight: 400,
                             fontSize: 14,
                             lineHeight: '140%',
-                            color: '#1E1E1E',
+                            color: isDark ? '#E0E0E0' : '#1E1E1E',
                         }}>
                             {row.value}
                         </span>
@@ -205,6 +207,9 @@ export default function AdViewPage() {
     const [item, setItem] = useState<AdItem | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
 
     useEffect(() => {
         if (!id) return;
@@ -235,7 +240,8 @@ export default function AdViewPage() {
 
     if (loading) {
         return (
-            <div style={pageWrapStyle}>
+            <div style={{ ...pageWrapStyle, background: isDark ? '#141414' : '#FFFFFF' }}>
+                <ThemeToggle />
                 <p style={{ textAlign: 'center', padding: '80px 0', color: 'rgba(0,0,0,0.45)', fontSize: 14, fontFamily: 'Roboto, sans-serif' }}>
                     Загрузка...
                 </p>
@@ -245,7 +251,7 @@ export default function AdViewPage() {
 
     if (error || !item) {
         return (
-            <div style={pageWrapStyle}>
+            <div style={{ ...pageWrapStyle, background: isDark ? '#141414' : '#FFFFFF' }}>
                 <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 42px' }}>
                     <p style={{ textAlign: 'center', padding: '60px 0', color: '#ff4d4f', fontSize: 14, fontFamily: 'Roboto, sans-serif' }}>
                         {error ?? 'Объявление не найдено'}
@@ -264,7 +270,8 @@ export default function AdViewPage() {
     const missingFields = getMissingFields(item);
 
     return (
-        <div style={pageWrapStyle}>
+        <div style={{ ...pageWrapStyle, background: isDark ? '#141414' : '#FFFFFF' }}>
+            <ThemeToggle />
             <div style={innerStyle}>
 
                 {/*Название Цена */}
@@ -283,7 +290,7 @@ export default function AdViewPage() {
                             fontSize: 30,
                             lineHeight: '40px',
                             letterSpacing: 0,
-                            color: 'rgba(0,0,0,0.85)',
+                            color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
                             margin: 0,
                         }}>
                             {item.title}
@@ -322,7 +329,7 @@ export default function AdViewPage() {
                             fontSize: 30,
                             lineHeight: '40px',
                             letterSpacing: 0,
-                            color: 'rgba(0,0,0,0.85)',
+                            color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
                             margin: 0,
                         }}>
                             {formatPrice(item.price)}
@@ -338,7 +345,7 @@ export default function AdViewPage() {
                 </div>
 
                 {/*Разделитель*/}
-                <div style={{ height: 1, background: '#F0F0F0', marginBottom: 24 }} />
+                <div style={{ height: 1, background: isDark ? '#303030' : '#F0F0F0', marginBottom: 24 }} />
 
                 {/*Основной контент*/}
                 <div style={{ display: 'flex', gap: 0, alignItems: 'flex-start' }}>
@@ -374,14 +381,21 @@ export default function AdViewPage() {
 
                         {/* Описание — под фото */}
                         <div>
-                            <h2 style={sectionTitleStyle}>Описание</h2>
+                            <h2 style={{
+                                fontFamily: 'Roboto, sans-serif',
+                                fontWeight: 700,
+                                fontSize: 18,
+                                lineHeight: '10px',
+                                color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
+                                margin: '0 0 12px 0',
+                            }}>Описание</h2>
                             {item.description ? (
                                 <p style={{
                                     fontFamily: 'Roboto, sans-serif',
                                     fontWeight: 400,
                                     fontSize: 14,
                                     lineHeight: '140%',
-                                    color: '#1E1E1E',
+                                    color: isDark ? '#E0E0E0' : '#1E1E1E',
                                     margin: 0,
                                     whiteSpace: 'pre-wrap',
                                 }}>
@@ -446,7 +460,7 @@ export default function AdViewPage() {
                         )}
 
                         {/* Характеристики*/}
-                        <CharacteristicsBlock item={item} />
+                        <CharacteristicsBlock item={item} isDark={isDark} />
                     </div>
                 </div>
             </div>
@@ -458,7 +472,6 @@ export default function AdViewPage() {
 
 const pageWrapStyle: React.CSSProperties = {
     minHeight: '100vh',
-    background: '#FFFFFF',
     fontFamily: 'Roboto, sans-serif',
 };
 
@@ -468,15 +481,6 @@ const innerStyle: React.CSSProperties = {
     margin: '0 auto',
     padding: '24px 42px 40px',
     boxSizing: 'border-box',
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-    fontFamily: 'Roboto, sans-serif',
-    fontWeight: 700,
-    fontSize: 18,
-    lineHeight: '10px',
-    color: 'rgba(0,0,0,0.85)',
-    margin: '0 0 12px 0',
 };
 
 const dateStyle: React.CSSProperties = {

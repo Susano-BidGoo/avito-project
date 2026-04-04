@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTheme } from '../context/theme';
+import { ThemeToggle } from '../components/ThemeToggle';
 import photoPlaceholder from '../assets/photo.svg';
 
 import sectBlackUrl from '../assets/Sect black.svg';
@@ -532,6 +534,9 @@ export default function AdsListPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     const [search, setSearch] = useState(searchParams.get('q') ?? '');
     const [sortColumn, setSortColumn] = useState<SortColumn>((searchParams.get('sortColumn') as SortColumn) ?? 'createdAt');
     const [sortDirection, setSortDirection] = useState<SortDirection>((searchParams.get('sortDirection') as SortDirection) ?? 'desc');
@@ -674,11 +679,12 @@ export default function AdsListPage() {
         <div
             style={{
                 minHeight: '100vh',
-                background: '#F7F5F8',
+                background: isDark ? '#141414' : '#F7F5F8',
                 boxSizing: 'border-box',
                 fontFamily: 'Roboto, sans-serif',
             }}
         >
+            <ThemeToggle />
             <div
                 style={{
                     maxWidth: 1440,

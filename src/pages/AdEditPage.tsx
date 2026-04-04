@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/theme';
+import { ThemeToggle } from '../components/ThemeToggle';
 import lampUrl from '../assets/Lamp.svg';
 import replayUrl from '../assets/Replay.svg';
 import starUrl from '../assets/Star.svg';
@@ -487,6 +489,9 @@ export default function AdEditPage() {
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     // AI — описание
     const [descAiStatus, setDescAiStatus] = useState<AiStatus>('idle');
     const [descAiResult, setDescAiResult] = useState<string | null>(null);
@@ -756,7 +761,8 @@ export default function AdEditPage() {
     const valid = isFormValid(form);
 
     return (
-        <div style={pageWrap}>
+        <div style={{ ...pageWrap, background: isDark ? '#141414' : '#FFFFFF' }}>
+            <ThemeToggle />
             {notification && <Notification type={notification} />}
 
             {/* Убираем стрелочки у number input */}
