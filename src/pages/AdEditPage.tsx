@@ -77,19 +77,19 @@ function fieldWrapStyle(): React.CSSProperties {
     return { display: 'flex', flexDirection: 'column', gap: 4 };
 }
 
-function labelStyle(): React.CSSProperties {
+function labelStyle(dark: boolean): React.CSSProperties {
     return {
         fontFamily: 'Roboto, sans-serif',
         fontWeight: 400,
         fontSize: 14,
-        color: 'rgba(0,0,0,0.85)',
+        color: dark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
         display: 'flex',
         alignItems: 'center',
         gap: 4,
     };
 }
 
-function inputStyle(hasError: boolean, hasWarning = false): React.CSSProperties {
+function inputStyle(hasError: boolean, hasWarning = false, dark = false): React.CSSProperties {
     return {
         width: 456,
         boxSizing: 'border-box' as const,
@@ -99,19 +99,19 @@ function inputStyle(hasError: boolean, hasWarning = false): React.CSSProperties 
             ? '1px solid #EC221F'
             : hasWarning
                 ? '1px solid #FAAD14'
-                : '1px solid #D9D9D9',
+                : dark ? '1px solid #434343' : '1px solid #D9D9D9',
         fontFamily: 'Roboto, sans-serif',
         fontSize: 14,
-        color: 'rgba(0,0,0,0.85)',
+        color: dark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
         outline: 'none',
-        background: '#FFFFFF',
+        background: dark ? '#2a2a2a' : '#FFFFFF',
         height: 32,
     };
 }
 
-function selectStyle(hasError: boolean, hasWarning = false): React.CSSProperties {
+function selectStyle(hasError: boolean, hasWarning = false, dark = false): React.CSSProperties {
     return {
-        ...inputStyle(hasError, hasWarning),
+        ...inputStyle(hasError, hasWarning, dark),
         appearance: 'none' as const,
         WebkitAppearance: 'none' as const,
         cursor: 'pointer',
@@ -132,14 +132,16 @@ function errorText(msg: string) {
     );
 }
 
-const divider = (
-    <div style={{
-        width: 'calc(100vw - 64px)',
-        maxWidth: 1036,
-        height: 1,
-        background: '#F0F0F0',
-    }} />
-);
+function Divider({ isDark }: { isDark: boolean }) {
+    return (
+        <div style={{
+            width: 'calc(100vw - 64px)',
+            maxWidth: 1036,
+            height: 1,
+            background: isDark ? '#303030' : '#F0F0F0',
+        }} />
+    );
+}
 
 //AI Tooltip
 
@@ -148,9 +150,10 @@ interface AiTooltipProps {
     error: string | null;
     onApply?: () => void;
     onClose: () => void;
+    isDark?: boolean;
 }
 
-function AiTooltip({ result, error, onApply, onClose }: AiTooltipProps) {
+function AiTooltip({ result, error, onApply, onClose, isDark = false }: AiTooltipProps) {
     if (!result && !error) return null;
 
     if (error) {
@@ -174,61 +177,26 @@ function AiTooltip({ result, error, onApply, onClose }: AiTooltipProps) {
                     boxSizing: 'border-box' as const,
                     position: 'relative',
                 }}>
-                    <p style={{
-                        margin: 0,
-                        fontFamily: 'Roboto, sans-serif',
-                        fontWeight: 500,
-                        fontSize: 12,
-                        lineHeight: '18px',
-                        color: '#C00F0C',
-                    }}>
+                    <p style={{ margin: 0, fontFamily: 'Roboto, sans-serif', fontWeight: 500, fontSize: 12, lineHeight: '18px', color: '#C00F0C' }}>
                         Произошла ошибка при запросе к AI
                     </p>
-                    <p style={{
-                        margin: 0,
-                        fontFamily: 'Roboto, sans-serif',
-                        fontWeight: 400,
-                        fontSize: 12,
-                        lineHeight: '18px',
-                        color: '#1E1E1E',
-                    }}>
+                    <p style={{ margin: 0, fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 12, lineHeight: '18px', color: '#1E1E1E' }}>
                         Попробуйте повторить запрос или закройте уведомление
                     </p>
                     <div>
                         <button onClick={onClose} style={{
-                            background: '#FCB3AD',
-                            color: 'rgba(0,0,0,0.85)',
-                            border: '1px solid #D9D9D9',
-                            borderRadius: 4,
-                            padding: '0px 7px',
-                            height: 24,
-                            cursor: 'pointer',
-                            fontFamily: 'Roboto, sans-serif',
-                            fontWeight: 400,
-                            fontSize: 14,
-                            lineHeight: '22px',
-                            letterSpacing: 0,
-                            textAlign: 'center' as const,
-                            boxShadow: '0px 2px 0px rgba(0,0,0,0.016)',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 10,
+                            background: '#FCB3AD', color: 'rgba(0,0,0,0.85)', border: '1px solid #D9D9D9',
+                            borderRadius: 4, padding: '0px 7px', height: 24, cursor: 'pointer',
+                            fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14, lineHeight: '22px',
+                            display: 'inline-flex', alignItems: 'center', gap: 10,
                         }}>
                             Закрыть
                         </button>
                     </div>
-
-                    {/* Уголок снизу-слева */}
                     <div style={{
-                        position: 'absolute',
-                        bottom: -8,
-                        left: 20,
-                        width: 0,
-                        height: 0,
-                        borderLeft: '8px solid transparent',
-                        borderRight: '8px solid transparent',
-                        borderTop: '8px solid #FEE9E7',
-                        filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.08))',
+                        position: 'absolute', bottom: -8, left: 20, width: 0, height: 0,
+                        borderLeft: '8px solid transparent', borderRight: '8px solid transparent',
+                        borderTop: '8px solid #FEE9E7', filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.08))',
                     }} />
                 </div>
             </div>
@@ -238,81 +206,31 @@ function AiTooltip({ result, error, onApply, onClose }: AiTooltipProps) {
     return (
         <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: 8, zIndex: 100, width: 320 }}>
             <div style={{
-                background: '#fff',
+                background: isDark ? '#2a2a2a' : '#fff',
                 borderRadius: 2,
                 boxShadow: '0px 2px 8px 0px rgba(0,0,0,0.15)',
-                padding: '10px 12px 12px',
-                position: 'relative',
-                boxSizing: 'border-box' as const,
+                padding: '10px 12px 12px', position: 'relative', boxSizing: 'border-box' as const,
             }}>
-                <p style={{
-                    margin: '0 0 6px 0',
-                    fontFamily: 'Roboto, sans-serif',
-                    fontWeight: 700,
-                    fontSize: 13,
-                    lineHeight: '20px',
-                    color: 'rgba(0,0,0,0.85)',
-                }}>
+                <p style={{ margin: '0 0 6px 0', fontFamily: 'Roboto, sans-serif', fontWeight: 700, fontSize: 13, lineHeight: '20px', color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)' }}>
                     Ответ AI:
                 </p>
-
-                <p style={{
-                    margin: '0 0 8px 0',
-                    fontFamily: 'Roboto, sans-serif',
-                    fontSize: 12,
-                    lineHeight: '18px',
-                    letterSpacing: 0,
-                    color: '#1E1E1E',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word',
-                    overflowWrap: 'break-word',
-                }}>
+                <p style={{ margin: '0 0 8px 0', fontFamily: 'Roboto, sans-serif', fontSize: 12, lineHeight: '18px', color: isDark ? '#E0E0E0' : '#1E1E1E', whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                     {result}
                 </p>
-
                 <div style={{ display: 'flex', gap: 6 }}>
                     {onApply && (
-                        <button onClick={onApply} style={{
-                            background: '#1890FF',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 6,
-                            padding: '3px 12px',
-                            cursor: 'pointer',
-                            fontFamily: 'Roboto, sans-serif',
-                            fontWeight: 400,
-                            fontSize: 13,
-                            lineHeight: '20px',
-                        }}>
+                        <button onClick={onApply} style={{ background: '#1890FF', color: '#fff', border: 'none', borderRadius: 6, padding: '3px 12px', cursor: 'pointer', fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 13, lineHeight: '20px' }}>
                             Применить
                         </button>
                     )}
-                    <button onClick={onClose} style={{
-                        background: '#fff',
-                        color: 'rgba(0,0,0,0.85)',
-                        border: '1px solid #D9D9D9',
-                        borderRadius: 6,
-                        padding: '3px 12px',
-                        cursor: 'pointer',
-                        fontFamily: 'Roboto, sans-serif',
-                        fontWeight: 400,
-                        fontSize: 13,
-                        lineHeight: '20px',
-                    }}>
+                    <button onClick={onClose} style={{ background: isDark ? '#3a3a3a' : '#fff', color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)', border: isDark ? '1px solid #434343' : '1px solid #D9D9D9', borderRadius: 6, padding: '3px 12px', cursor: 'pointer', fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 13, lineHeight: '20px' }}>
                         Закрыть
                     </button>
                 </div>
-
-                {/* Уголок снизу-слева */}
                 <div style={{
-                    position: 'absolute',
-                    bottom: -8,
-                    left: 20,
-                    width: 0,
-                    height: 0,
-                    borderLeft: '8px solid transparent',
-                    borderRight: '8px solid transparent',
-                    borderTop: '8px solid #fff',
+                    position: 'absolute', bottom: -8, left: 20, width: 0, height: 0,
+                    borderLeft: '8px solid transparent', borderRight: '8px solid transparent',
+                    borderTop: isDark ? '8px solid #2a2a2a' : '8px solid #fff',
                     filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.08))',
                 }} />
             </div>
@@ -333,6 +251,8 @@ interface AiButtonProps {
 }
 
 function AiButton({ idleLabel, loading, done, onClick, disabled }: AiButtonProps) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const label = loading ? 'Выполняется запрос' : done ? 'Повторить запрос' : idleLabel;
     const icon = done ? replayUrl : lampUrl;
 
@@ -341,39 +261,19 @@ function AiButton({ idleLabel, loading, done, onClick, disabled }: AiButtonProps
             onClick={onClick}
             disabled={disabled || loading}
             style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '4px 12px',
-                borderRadius: 8,
-                border: 'none',
-                background: '#F9F1E6',
+                display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 12px',
+                borderRadius: 8, border: 'none',
+                background: isDark ? '#2D2000' : '#F9F1E6',
                 cursor: loading || disabled ? 'default' : 'pointer',
-                opacity: disabled ? 0.5 : 1,
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
+                opacity: disabled ? 0.5 : 1, whiteSpace: 'nowrap', flexShrink: 0,
             }}
         >
             {loading ? (
-                <img
-                    src={loadingUrl}
-                    alt=""
-                    width={14}
-                    height={14}
-                    style={{ animation: 'spin 1s linear infinite', display: 'inline-block', flexShrink: 0 }}
-                />
+                <img src={loadingUrl} alt="" width={14} height={14} style={{ animation: 'spin 1s linear infinite', display: 'inline-block', flexShrink: 0 }} />
             ) : (
                 <img src={icon} alt="" width={14} height={14} />
             )}
-            <span style={{
-                fontFamily: 'Roboto, sans-serif',
-                fontWeight: 400,
-                fontSize: 14,
-                lineHeight: '22px',
-                letterSpacing: '0%',
-                textAlign: 'center' as const,
-                color: '#FFA940',
-            }}>
+            <span style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: isDark ? '#FFD666' : '#FFA940' }}>
                 {label}
             </span>
         </button>
@@ -396,14 +296,10 @@ function Notification({ type }: { type: 'success' | 'error' }) {
 
 //FieldRow
 
-function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+function FieldRow({ label, children, isDark }: { label: string; children: React.ReactNode; isDark: boolean }) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <label style={{
-                fontFamily: 'Roboto, sans-serif',
-                fontSize: 14,
-                color: 'rgba(0,0,0,0.85)',
-            }}>
+            <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)' }}>
                 {label}
             </label>
             {children}
@@ -411,13 +307,14 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
     );
 }
 
-function ClearableInput({ value, onChange, placeholder, hasError, hasWarning, type = 'text' }: {
+function ClearableInput({ value, onChange, placeholder, hasError, hasWarning, type = 'text', dark = false }: {
     value: string;
     onChange: (v: string) => void;
     placeholder?: string;
     hasError?: boolean;
     hasWarning?: boolean;
     type?: string;
+    dark?: boolean;
 }) {
     return (
         <div style={{ position: 'relative', width: 456 }}>
@@ -426,27 +323,16 @@ function ClearableInput({ value, onChange, placeholder, hasError, hasWarning, ty
                 value={value}
                 onChange={e => onChange(e.target.value)}
                 placeholder={placeholder}
-                style={{ ...inputStyle(!!hasError, !!hasWarning), width: '100%', paddingRight: value ? 32 : 12 }}
+                style={{ ...inputStyle(!!hasError, !!hasWarning, dark), width: '100%', paddingRight: value ? 32 : 12 }}
             />
             {value && (
                 <button
                     onClick={() => onChange('')}
                     style={{
-                        position: 'absolute',
-                        right: 8,
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        width: 14,
-                        height: 14,
-                        borderRadius: '50%',
-                        background: '#00000040',
-                        border: 'none',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: 0,
-                        flexShrink: 0,
+                        position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+                        width: 14, height: 14, borderRadius: '50%', background: dark ? '#ffffff40' : '#00000040',
+                        border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', padding: 0, flexShrink: 0,
                     }}
                 >
                     <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
@@ -492,13 +378,11 @@ export default function AdEditPage() {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
 
-    // AI — описание
     const [descAiStatus, setDescAiStatus] = useState<AiStatus>('idle');
     const [descAiResult, setDescAiResult] = useState<string | null>(null);
     const [descAiError, setDescAiError] = useState<string | null>(null);
     const descAbortRef = useRef<AbortController | null>(null);
 
-    // AI — цена
     const [priceAiStatus, setPriceAiStatus] = useState<AiStatus>('idle');
     const [priceAiResult, setPriceAiResult] = useState<string | null>(null);
     const [priceAiError, setPriceAiError] = useState<string | null>(null);
@@ -568,20 +452,16 @@ export default function AdEditPage() {
                 }
             });
 
-        return () => {
-            controller.abort();
-        };
+        return () => { controller.abort(); };
     }, [id]);
 
     //Черновик
-
     useEffect(() => {
         if (!id || loading) return;
         localStorage.setItem(getDraftKey(id), JSON.stringify(form));
     }, [form, id, loading]);
 
     //Смена категории
-
     function handleCategoryChange(cat: Category) {
         setForm(f => ({ ...f, category: cat, params: {} }));
     }
@@ -591,7 +471,6 @@ export default function AdEditPage() {
     }
 
     //Сохранение
-
     async function handleSave() {
         setSubmitted(true);
         if (!isFormValid(form) || !id) return;
@@ -627,7 +506,6 @@ export default function AdEditPage() {
     }
 
     //AI
-
     async function callOllama(prompt: string, signal: AbortSignal): Promise<string> {
         const res = await fetch(`${OLLAMA_BASE}/api/generate`, {
             method: 'POST',
@@ -642,9 +520,7 @@ export default function AdEditPage() {
 
     function buildContext() {
         const categoryLabels: Record<string, string> = {
-            auto: 'Авто',
-            real_estate: 'Недвижимость',
-            electronics: 'Электроника',
+            auto: 'Авто', real_estate: 'Недвижимость', electronics: 'Электроника',
         };
         const params = Object.entries(form.params)
             .filter(([, v]) => v !== '' && v !== undefined)
@@ -698,10 +574,7 @@ export default function AdEditPage() {
 
     function applyPriceFromAi() {
         if (!priceAiResult) return;
-
         const text = priceAiResult.replace(/\u00A0/g, ' ');
-
-        // Ищем диапазон рядом с маркером рублей
         const rangeMatch = text.match(/(\d[\d\s]*)\s*[-–—]\s*(\d[\d\s]*)\s*(?:рублей|руб|₽)/i)
             ?? text.match(/от\s*(\d[\d\s]*)\s*до\s*(\d[\d\s]*)\s*(?:рублей|руб|₽)?/i);
 
@@ -709,40 +582,31 @@ export default function AdEditPage() {
             const from = Number(rangeMatch[1].replace(/\s/g, ''));
             const to = Number(rangeMatch[2].replace(/\s/g, ''));
             if (from > 0 && to > 0) {
-                const average = Math.round((from + to) / 2);
-                setForm(f => ({ ...f, price: String(average) }));
-                setPriceAiResult(null);
-                setPriceAiError(null);
-                setPriceAiStatus('idle');
+                setForm(f => ({ ...f, price: String(Math.round((from + to) / 2)) }));
+                setPriceAiResult(null); setPriceAiError(null); setPriceAiStatus('idle');
                 return;
             }
         }
 
-        // Если диапазон не найден — ищем одиночное число рядом с рублями
         const singleMatch = text.match(/(\d[\d\s]*)\s*(?:рублей|руб|₽)/i);
         if (singleMatch) {
             const num = Number(singleMatch[1].replace(/\s/g, ''));
             if (num > 0) setForm(f => ({ ...f, price: String(num) }));
         }
-
-        setPriceAiResult(null);
-        setPriceAiError(null);
-        setPriceAiStatus('idle');
+        setPriceAiResult(null); setPriceAiError(null); setPriceAiStatus('idle');
     }
+
     function applyDescFromAi() {
         if (!descAiResult) return;
         setForm(f => ({ ...f, description: descAiResult! }));
-        setDescAiResult(null);
-        setDescAiError(null);
-        setDescAiStatus('idle');
+        setDescAiResult(null); setDescAiError(null); setDescAiStatus('idle');
     }
 
     //Рендер
-
     if (loading) {
         return (
-            <div style={pageWrap}>
-                <p style={{ textAlign: 'center', padding: '80px 0', color: 'rgba(0,0,0,0.45)', fontSize: 14, fontFamily: 'Roboto, sans-serif' }}>
+            <div style={{ ...pageWrap, background: isDark ? '#141414' : '#ffffff' }}>
+                <p style={{ textAlign: 'center', padding: '80px 0', color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)', fontSize: 14, fontFamily: 'Roboto, sans-serif' }}>
                     Загрузка...
                 </p>
             </div>
@@ -751,7 +615,7 @@ export default function AdEditPage() {
 
     if (error) {
         return (
-            <div style={pageWrap}>
+            <div style={{ ...pageWrap, background: isDark ? '#141414' : '#ffffff' }}>
                 <p style={{ padding: '80px 42px', color: '#ff4d4f', fontSize: 14 }}>{error}</p>
             </div>
         );
@@ -761,11 +625,10 @@ export default function AdEditPage() {
     const valid = isFormValid(form);
 
     return (
-        <div style={{ ...pageWrap, background: isDark ? '#141414' : '#FFFFFF' }}>
+        <div style={{ ...pageWrap, background: isDark ? '#141414' : '#ffffff' }}>
             <ThemeToggle />
             {notification && <Notification type={notification} />}
 
-            {/* Убираем стрелочки у number input */}
             <style>{`
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
                 input[type=number]::-webkit-outer-spin-button,
@@ -774,8 +637,7 @@ export default function AdEditPage() {
             `}</style>
 
             <div style={innerWrap}>
-
-                <h1 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 24, color: 'rgba(0,0,0,0.85)', margin: '0 0 24px 0' }}>
+                <h1 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 24, color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)', margin: '0 0 24px 0' }}>
                     Редактирование объявления
                 </h1>
 
@@ -784,17 +646,15 @@ export default function AdEditPage() {
                     {/*Категория*/}
                     <div style={{ paddingBottom: 16 }}>
                         <div style={fieldWrapStyle()}>
-                            <label style={labelStyle()}>
+                            <label style={labelStyle(isDark)}>
                                 <img src={starUrl} alt="*" width={8} height={8} />
                                 Категория
                             </label>
                             <div style={{ position: 'relative', maxWidth: 220 }}>
                                 <select
                                     value={form.category}
-                                    onChange={e => {
-                                        handleCategoryChange(e.target.value as Category);
-                                    }}
-                                    style={{ ...selectStyle(submitted && !form.category), width: 220 }}
+                                    onChange={e => handleCategoryChange(e.target.value as Category)}
+                                    style={{ ...selectStyle(submitted && !form.category, false, isDark), width: 220 }}
                                 >
                                     <option value="">Выберите категорию</option>
                                     <option value="electronics">Электроника</option>
@@ -807,31 +667,32 @@ export default function AdEditPage() {
                         </div>
                     </div>
 
-                    {divider}
+                    <Divider isDark={isDark} />
 
                     {/*Название*/}
                     <div style={{ paddingTop: 16, paddingBottom: 16 }}>
                         <div style={fieldWrapStyle()}>
-                            <label style={labelStyle()}>
+                            <label style={labelStyle(isDark)}>
                                 <img src={starUrl} alt="*" width={8} height={8} />
                                 Название
                             </label>
                             <ClearableInput
                                 value={form.title}
-                                onChange={v => { setForm(f => ({ ...f, title: v })); }}
+                                onChange={v => setForm(f => ({ ...f, title: v }))}
                                 placeholder="Название"
                                 hasError={submitted && !form.title.trim()}
+                                dark={isDark}
                             />
                             {submitted && !form.title.trim() && errorText('Название должно быть заполнено')}
                         </div>
                     </div>
 
-                    {divider}
+                    <Divider isDark={isDark} />
 
                     {/*Цена*/}
                     <div style={{ paddingTop: 16, paddingBottom: 16 }}>
                         <div style={fieldWrapStyle()}>
-                            <label style={labelStyle()}>
+                            <label style={labelStyle(isDark)}>
                                 <img src={starUrl} alt="*" width={8} height={8} />
                                 Цена (₽)
                             </label>
@@ -840,12 +701,10 @@ export default function AdEditPage() {
                                     <input
                                         type="number"
                                         value={form.price}
-                                        onChange={e => {
-                                            setForm(f => ({ ...f, price: e.target.value }));
-                                        }}
+                                        onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
                                         placeholder="Цена"
                                         min={0}
-                                        style={{ ...inputStyle(submitted && (!form.price || Number(form.price) <= 0)), width: 456 }}
+                                        style={{ ...inputStyle(submitted && (!form.price || Number(form.price) <= 0), false, isDark), width: 456 }}
                                     />
                                     {submitted && (!form.price || Number(form.price) <= 0) && errorText('Цена должна быть заполнена')}
                                 </div>
@@ -855,6 +714,7 @@ export default function AdEditPage() {
                                         error={priceAiError}
                                         onApply={priceAiResult ? applyPriceFromAi : undefined}
                                         onClose={() => { setPriceAiResult(null); setPriceAiError(null); setPriceAiStatus('idle'); }}
+                                        isDark={isDark}
                                     />
                                     <AiButton
                                         idleLabel="Узнать рыночную цену"
@@ -867,24 +727,20 @@ export default function AdEditPage() {
                         </div>
                     </div>
 
-                    {divider}
+                    <Divider isDark={isDark} />
 
                     {/*Характеристики*/}
                     {form.category !== '' && (
                         <>
                             <div style={{ paddingTop: 16, paddingBottom: 16 }}>
-                                <p style={sectionTitle}>Характеристики</p>
+                                <p style={{ ...sectionTitle, color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)' }}>Характеристики</p>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
                                     {form.category === 'electronics' && (
                                         <>
-                                            <FieldRow label="Тип">
+                                            <FieldRow label="Тип" isDark={isDark}>
                                                 <div style={{ position: 'relative', width: 456 }}>
-                                                    <select
-                                                        value={p.type ?? ''}
-                                                        onChange={e => setParam('type', e.target.value)}
-                                                        style={selectStyle(false, !p.type)}
-                                                    >
+                                                    <select value={p.type ?? ''} onChange={e => setParam('type', e.target.value)} style={selectStyle(false, !p.type, isDark)}>
                                                         <option value="">Тип</option>
                                                         <option value="phone">Телефон</option>
                                                         <option value="laptop">Ноутбук</option>
@@ -893,29 +749,15 @@ export default function AdEditPage() {
                                                     <SelectArrow />
                                                 </div>
                                             </FieldRow>
-                                            <FieldRow label="Бренд">
-                                                <ClearableInput
-                                                    value={p.brand ?? ''}
-                                                    onChange={v => setParam('brand', v)}
-                                                    placeholder="Бренд"
-                                                    hasWarning={!p.brand}
-                                                />
+                                            <FieldRow label="Бренд" isDark={isDark}>
+                                                <ClearableInput value={p.brand ?? ''} onChange={v => setParam('brand', v)} placeholder="Бренд" hasWarning={!p.brand} dark={isDark} />
                                             </FieldRow>
-                                            <FieldRow label="Модель">
-                                                <ClearableInput
-                                                    value={p.model ?? ''}
-                                                    onChange={v => setParam('model', v)}
-                                                    placeholder="Модель"
-                                                    hasWarning={!p.model}
-                                                />
+                                            <FieldRow label="Модель" isDark={isDark}>
+                                                <ClearableInput value={p.model ?? ''} onChange={v => setParam('model', v)} placeholder="Модель" hasWarning={!p.model} dark={isDark} />
                                             </FieldRow>
-                                            <FieldRow label="Состояние">
+                                            <FieldRow label="Состояние" isDark={isDark}>
                                                 <div style={{ position: 'relative', width: 456 }}>
-                                                    <select
-                                                        value={p.condition ?? ''}
-                                                        onChange={e => setParam('condition', e.target.value)}
-                                                        style={selectStyle(false, !p.condition)}
-                                                    >
+                                                    <select value={p.condition ?? ''} onChange={e => setParam('condition', e.target.value)} style={selectStyle(false, !p.condition, isDark)}>
                                                         <option value="">Состояние</option>
                                                         <option value="new">Новое</option>
                                                         <option value="used">Б/у</option>
@@ -923,31 +765,26 @@ export default function AdEditPage() {
                                                     <SelectArrow />
                                                 </div>
                                             </FieldRow>
-                                            <FieldRow label="Цвет">
-                                                <ClearableInput
-                                                    value={p.color ?? ''}
-                                                    onChange={v => setParam('color', v)}
-                                                    placeholder="Цвет"
-                                                    hasWarning={!p.color}
-                                                />
+                                            <FieldRow label="Цвет" isDark={isDark}>
+                                                <ClearableInput value={p.color ?? ''} onChange={v => setParam('color', v)} placeholder="Цвет" hasWarning={!p.color} dark={isDark} />
                                             </FieldRow>
                                         </>
                                     )}
 
                                     {form.category === 'auto' && (
                                         <>
-                                            <FieldRow label="Марка">
-                                                <ClearableInput value={p.brand ?? ''} onChange={v => setParam('brand', v)} placeholder="Марка" hasWarning={!p.brand} />
+                                            <FieldRow label="Марка" isDark={isDark}>
+                                                <ClearableInput value={p.brand ?? ''} onChange={v => setParam('brand', v)} placeholder="Марка" hasWarning={!p.brand} dark={isDark} />
                                             </FieldRow>
-                                            <FieldRow label="Модель">
-                                                <ClearableInput value={p.model ?? ''} onChange={v => setParam('model', v)} placeholder="Модель" hasWarning={!p.model} />
+                                            <FieldRow label="Модель" isDark={isDark}>
+                                                <ClearableInput value={p.model ?? ''} onChange={v => setParam('model', v)} placeholder="Модель" hasWarning={!p.model} dark={isDark} />
                                             </FieldRow>
-                                            <FieldRow label="Год выпуска">
-                                                <ClearableInput type="number" value={String(p.yearOfManufacture ?? '')} onChange={v => setParam('yearOfManufacture', Number(v))} placeholder="Год выпуска" hasWarning={!p.yearOfManufacture} />
+                                            <FieldRow label="Год выпуска" isDark={isDark}>
+                                                <ClearableInput type="number" value={String(p.yearOfManufacture ?? '')} onChange={v => setParam('yearOfManufacture', Number(v))} placeholder="Год выпуска" hasWarning={!p.yearOfManufacture} dark={isDark} />
                                             </FieldRow>
-                                            <FieldRow label="Коробка передач">
+                                            <FieldRow label="Коробка передач" isDark={isDark}>
                                                 <div style={{ position: 'relative', width: 456 }}>
-                                                    <select value={p.transmission ?? ''} onChange={e => setParam('transmission', e.target.value)} style={selectStyle(false, !p.transmission)}>
+                                                    <select value={p.transmission ?? ''} onChange={e => setParam('transmission', e.target.value)} style={selectStyle(false, !p.transmission, isDark)}>
                                                         <option value="">Коробка передач</option>
                                                         <option value="automatic">Автомат</option>
                                                         <option value="manual">Механика</option>
@@ -955,20 +792,20 @@ export default function AdEditPage() {
                                                     <SelectArrow />
                                                 </div>
                                             </FieldRow>
-                                            <FieldRow label="Пробег (км)">
-                                                <ClearableInput type="number" value={String(p.mileage ?? '')} onChange={v => setParam('mileage', Number(v))} placeholder="Пробег" hasWarning={!p.mileage} />
+                                            <FieldRow label="Пробег (км)" isDark={isDark}>
+                                                <ClearableInput type="number" value={String(p.mileage ?? '')} onChange={v => setParam('mileage', Number(v))} placeholder="Пробег" hasWarning={!p.mileage} dark={isDark} />
                                             </FieldRow>
-                                            <FieldRow label="Мощность (л.с.)">
-                                                <ClearableInput type="number" value={String(p.enginePower ?? '')} onChange={v => setParam('enginePower', Number(v))} placeholder="Мощность" hasWarning={!p.enginePower} />
+                                            <FieldRow label="Мощность (л.с.)" isDark={isDark}>
+                                                <ClearableInput type="number" value={String(p.enginePower ?? '')} onChange={v => setParam('enginePower', Number(v))} placeholder="Мощность" hasWarning={!p.enginePower} dark={isDark} />
                                             </FieldRow>
                                         </>
                                     )}
 
                                     {form.category === 'real_estate' && (
                                         <>
-                                            <FieldRow label="Тип">
-                                                <div style={{ position: 'relative' }}>
-                                                    <select value={p.type ?? ''} onChange={e => setParam('type', e.target.value)} style={selectStyle(false, !p.type)}>
+                                            <FieldRow label="Тип" isDark={isDark}>
+                                                <div style={{ position: 'relative', width: 456 }}>
+                                                    <select value={p.type ?? ''} onChange={e => setParam('type', e.target.value)} style={selectStyle(false, !p.type, isDark)}>
                                                         <option value="">Тип</option>
                                                         <option value="flat">Квартира</option>
                                                         <option value="house">Дом</option>
@@ -977,54 +814,45 @@ export default function AdEditPage() {
                                                     <SelectArrow />
                                                 </div>
                                             </FieldRow>
-                                            <FieldRow label="Адрес">
-                                                <ClearableInput value={p.address ?? ''} onChange={v => setParam('address', v)} placeholder="Адрес" hasWarning={!p.address} />
+                                            <FieldRow label="Адрес" isDark={isDark}>
+                                                <ClearableInput value={p.address ?? ''} onChange={v => setParam('address', v)} placeholder="Адрес" hasWarning={!p.address} dark={isDark} />
                                             </FieldRow>
-                                            <FieldRow label="Площадь (м²)">
-                                                <ClearableInput type="number" value={String(p.area ?? '')} onChange={v => setParam('area', Number(v))} placeholder="Площадь" hasWarning={!p.area} />
+                                            <FieldRow label="Площадь (м²)" isDark={isDark}>
+                                                <ClearableInput type="number" value={String(p.area ?? '')} onChange={v => setParam('area', Number(v))} placeholder="Площадь" hasWarning={!p.area} dark={isDark} />
                                             </FieldRow>
-                                            <FieldRow label="Этаж">
-                                                <ClearableInput type="number" value={String(p.floor ?? '')} onChange={v => setParam('floor', Number(v))} placeholder="Этаж" hasWarning={!p.floor} />
+                                            <FieldRow label="Этаж" isDark={isDark}>
+                                                <ClearableInput type="number" value={String(p.floor ?? '')} onChange={v => setParam('floor', Number(v))} placeholder="Этаж" hasWarning={!p.floor} dark={isDark} />
                                             </FieldRow>
                                         </>
                                     )}
                                 </div>
                             </div>
-                            {divider}
+                            <Divider isDark={isDark} />
                         </>
                     )}
 
                     {/*Описание*/}
                     <div style={{ paddingTop: 16, paddingBottom: 16 }}>
                         <div style={fieldWrapStyle()}>
-                            <label style={labelStyle()}>Описание</label>
+                            <label style={labelStyle(isDark)}>Описание</label>
                             <textarea
                                 ref={textareaRef}
                                 value={form.description}
-                                onChange={e => {
-                                    setForm(f => ({ ...f, description: e.target.value }));
-                                }}
+                                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                                 placeholder="Описание"
                                 style={{
-                                    width: 942,
-                                    height: 60,
-                                    boxSizing: 'border-box',
-                                    paddingTop: 8,
-                                    paddingRight: 16,
-                                    paddingBottom: 8,
-                                    paddingLeft: 16,
+                                    width: 942, height: 60, boxSizing: 'border-box',
+                                    paddingTop: 8, paddingRight: 16, paddingBottom: 8, paddingLeft: 16,
                                     borderRadius: 8,
-                                    border: '1px solid #D9D9D9',
-                                    fontFamily: 'Roboto, sans-serif',
-                                    fontSize: 14,
-                                    color: 'rgba(0,0,0,0.85)',
+                                    border: isDark ? '1px solid #434343' : '1px solid #D9D9D9',
+                                    fontFamily: 'Roboto, sans-serif', fontSize: 14,
+                                    color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
                                     outline: 'none',
-                                    background: '#fff',
-                                    resize: 'vertical',
-                                    minHeight: 60,
+                                    background: isDark ? '#2a2a2a' : '#fff',
+                                    resize: 'vertical', minHeight: 60,
                                 }}
                             />
-                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'rgba(0,0,0,0.35)', textAlign: 'right', width: 942, display: 'block' }}>
+                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', textAlign: 'right', width: 942, display: 'block' }}>
                                 {form.description.length}/1000
                             </span>
                             <div style={{ position: 'relative', display: 'inline-block', marginTop: 4 }}>
@@ -1033,6 +861,7 @@ export default function AdEditPage() {
                                     error={descAiError}
                                     onApply={descAiResult ? applyDescFromAi : undefined}
                                     onClose={() => { setDescAiResult(null); setDescAiError(null); setDescAiStatus('idle'); }}
+                                    isDark={isDark}
                                 />
                                 <AiButton
                                     idleLabel={form.description ? 'Улучшить описание' : 'Придумать описание'}
@@ -1044,7 +873,7 @@ export default function AdEditPage() {
                         </div>
                     </div>
 
-                    {divider}
+                    <Divider isDark={isDark} />
 
                     {/*Кнопки*/}
                     <div style={{ display: 'flex', gap: 12, paddingTop: 20 }}>
@@ -1052,16 +881,10 @@ export default function AdEditPage() {
                             onClick={handleSave}
                             disabled={saving}
                             style={{
-                                width: 108,
-                                height: 38,
-                                borderRadius: 8,
-                                border: 'none',
+                                width: 108, height: 38, borderRadius: 8, border: 'none',
                                 background: submitted && !valid ? '#D9D9D9' : '#1890FF',
                                 cursor: saving ? 'default' : 'pointer',
-                                fontFamily: 'Roboto, sans-serif',
-                                fontWeight: 400,
-                                fontSize: 14,
-                                color: '#F3F3F3',
+                                fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14, color: '#F3F3F3',
                             }}
                         >
                             {saving ? 'Сохраняю...' : 'Сохранить'}
@@ -1073,16 +896,11 @@ export default function AdEditPage() {
                                 navigate(`/ads/${id}`);
                             }}
                             style={{
-                                width: 108,
-                                height: 38,
-                                borderRadius: 8,
-                                border: 'none',
-                                background: '#D9D9D9',
+                                width: 108, height: 38, borderRadius: 8, border: 'none',
+                                background: isDark ? '#3a3a3a' : '#D9D9D9',
                                 cursor: 'pointer',
-                                fontFamily: 'Roboto, sans-serif',
-                                fontWeight: 400,
-                                fontSize: 14,
-                                color: 'rgba(0,0,0,0.85)',
+                                fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14,
+                                color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
                             }}
                         >
                             Отменить
@@ -1099,7 +917,6 @@ export default function AdEditPage() {
 
 const pageWrap: React.CSSProperties = {
     minHeight: '100vh',
-    background: '#ffffff',
     fontFamily: 'Roboto, sans-serif',
 };
 
@@ -1113,7 +930,5 @@ const sectionTitle: React.CSSProperties = {
     fontFamily: 'Roboto, sans-serif',
     fontWeight: 600,
     fontSize: 16,
-    color: 'rgba(0,0,0,0.85)',
     margin: '0 0 12px 0',
 };
-

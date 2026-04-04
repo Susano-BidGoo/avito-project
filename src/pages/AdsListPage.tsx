@@ -10,7 +10,6 @@ import listBlackUrl from '../assets/List black.svg';
 import listBlueUrl from '../assets/List blue.svg';
 import tickUrl from '../assets/Tick.svg';
 import blankCheckmarkUrl from '../assets/Blank checkmark.svg';
-import requiresImprovementsUrl from '../assets/Requires improvements.svg';
 import separatorUrl from '../assets/Separator.svg';
 
 //Types
@@ -49,7 +48,7 @@ const API_BASE = '/api';
 const LAYOUT_KEY = 'ads_layout';
 
 function formatPrice(price: number): string {
-    return `${price} ₽`
+    return `${price} ₽`;
 }
 
 //Icons
@@ -66,6 +65,8 @@ function SearchIcon() {
 //Toggle
 
 function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     return (
         <div
             onClick={() => onChange(!on)}
@@ -73,26 +74,18 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
                 width: 44,
                 height: 22,
                 borderRadius: 11,
-                backgroundColor: on ? '#000' : '#D9D9D9',
-                position: 'relative',
-                cursor: 'pointer',
-                flexShrink: 0,
+                backgroundColor: isDark
+                    ? on ? '#595959' : '#8C8C8C'
+                    : on ? '#595959' : '#D9D9D9',
+                position: 'relative', cursor: 'pointer', flexShrink: 0,
                 transition: 'background-color 0.2s',
             }}
         >
-            <div
-                style={{
-                    width: 18,
-                    height: 18,
-                    borderRadius: '50%',
-                    backgroundColor: '#fff',
-                    position: 'absolute',
-                    top: 2,
-                    left: on ? 24 : 2,
-                    transition: 'left 0.2s',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
-                }}
-            />
+            <div style={{
+                width: 18, height: 18, borderRadius: '50%', backgroundColor: '#fff',
+                position: 'absolute', top: 2, left: on ? 24 : 2,
+                transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+            }} />
         </div>
     );
 }
@@ -100,13 +93,37 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
 //NeedsBadge
 
 function NeedsBadge() {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     return (
-        <div style={{ width: 'fit-content' }}>
-            <img
-                src={requiresImprovementsUrl}
-                alt="Требует доработок"
-                style={{ display: 'block', height: 25, width: 'auto' }}
-            />
+        <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            background: isDark ? '#2D2000' : '#F9F1E6',
+            borderRadius: 8,
+            padding: '4px 10px 4px 8px',
+            height: 26,
+            boxSizing: 'border-box',
+            whiteSpace: 'nowrap',
+        }}>
+            <div style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: '#FAAD14',
+                flexShrink: 0,
+            }} />
+            <span style={{
+                fontFamily: 'Roboto, sans-serif',
+                fontWeight: 400,
+                fontSize: 12,
+                lineHeight: '18px',
+                color: isDark ? '#FFD666' : '#FAAD14',
+            }}>
+                Требует доработок
+            </span>
         </div>
     );
 }
@@ -119,36 +136,20 @@ interface FilterBlockProps {
     onlyNeedsRevision: boolean;
     onNeedsRevisionToggle: (v: boolean) => void;
     onReset: () => void;
+    isDark: boolean;
 }
 
-function FilterBlock({
-                         selectedCategories,
-                         onCategoryToggle,
-                         onlyNeedsRevision,
-                         onNeedsRevisionToggle,
-                         onReset,
-                     }: FilterBlockProps) {
+function FilterBlock({ selectedCategories, onCategoryToggle, onlyNeedsRevision, onNeedsRevisionToggle, onReset, isDark }: FilterBlockProps) {
     return (
         <div style={{ width: 256, flexShrink: 0 }}>
-            <div
-                style={{
-                    background: '#fff',
-                    borderRadius: 8,
-                    padding: '16px',
-                    boxSizing: 'border-box',
-                    width: '100%',
-                }}
-            >
-                <p
-                    style={{
-                        fontFamily: 'Roboto, sans-serif',
-                        fontWeight: 500,
-                        fontSize: 16,
-                        lineHeight: '24px',
-                        color: 'rgba(0,0,0,0.85)',
-                        margin: '0 0 12px 0',
-                    }}
-                >
+            <div style={{
+                background: isDark ? '#1f1f1f' : '#fff',
+                borderRadius: 8, padding: '16px', boxSizing: 'border-box', width: '100%',
+            }}>
+                <p style={{
+                    fontFamily: 'Roboto, sans-serif', fontWeight: 500, fontSize: 16, lineHeight: '24px',
+                    color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)', margin: '0 0 12px 0',
+                }}>
                     Фильтры
                 </p>
 
@@ -158,31 +159,14 @@ function FilterBlock({
                         return (
                             <label
                                 key={cat}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 8,
-                                    cursor: 'pointer',
-                                    padding: '5px 0',
-                                }}
+                                style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '5px 0' }}
                                 onClick={() => onCategoryToggle(cat)}
                             >
-                                <img
-                                    src={checked ? tickUrl : blankCheckmarkUrl}
-                                    alt={checked ? 'checked' : 'unchecked'}
-                                    width={16}
-                                    height={16}
-                                    style={{ flexShrink: 0 }}
-                                />
-                                <span
-                                    style={{
-                                        fontFamily: 'Roboto, sans-serif',
-                                        fontWeight: 400,
-                                        fontSize: 14,
-                                        lineHeight: '22px',
-                                        color: 'rgba(0,0,0,0.85)',
-                                    }}
-                                >
+                                <img src={checked ? tickUrl : blankCheckmarkUrl} alt={checked ? 'checked' : 'unchecked'} width={16} height={16} style={{ flexShrink: 0, opacity: isDark && !checked ? 0.4 : 1 }} />
+                                <span style={{
+                                    fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14, lineHeight: '22px',
+                                    color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
+                                }}>
                                     {CATEGORY_LABELS[cat]}
                                 </span>
                             </label>
@@ -190,18 +174,13 @@ function FilterBlock({
                     })}
                 </div>
 
-                <div style={{ height: 1, background: '#F0F0F0', margin: '12px 0' }} />
+                <div style={{ height: 1, background: isDark ? '#303030' : '#F0F0F0', margin: '12px 0' }} />
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                    <span
-                        style={{
-                            fontFamily: 'Roboto, sans-serif',
-                            fontWeight: 600,
-                            fontSize: 12,
-                            lineHeight: '140%',
-                            color: 'rgba(0,0,0,0.85)',
-                        }}
-                    >
+                    <span style={{
+                        fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 12, lineHeight: '140%',
+                        color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
+                    }}>
                         Только требующие доработок
                     </span>
                     <Toggle on={onlyNeedsRevision} onChange={onNeedsRevisionToggle} />
@@ -211,21 +190,12 @@ function FilterBlock({
             <button
                 onClick={onReset}
                 style={{
-                    display: 'block',
-                    width: '100%',
-                    marginTop: 8,
-                    background: '#fff',
-                    border: 'none',
-                    borderRadius: 8,
-                    padding: '10px 16px',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    fontFamily: 'Inter, sans-serif',
-                    fontWeight: 400,
-                    fontSize: 14,
-                    lineHeight: '100%',
-                    color: '#848388',
-                    boxSizing: 'border-box',
+                    display: 'block', width: '100%', marginTop: 8,
+                    background: isDark ? '#1f1f1f' : '#fff',
+                    border: 'none', borderRadius: 8, padding: '10px 16px',
+                    textAlign: 'center', cursor: 'pointer',
+                    fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 14, lineHeight: '100%',
+                    color: '#848388', boxSizing: 'border-box',
                 }}
             >
                 Сбросить фильтры
@@ -243,74 +213,43 @@ interface SearchBarProps {
     onSortChange: (v: string) => void;
     layout: Layout;
     onLayoutChange: (l: Layout) => void;
+    isDark: boolean;
 }
 
-function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, onLayoutChange }: SearchBarProps) {
+function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, onLayoutChange, isDark }: SearchBarProps) {
     return (
-        <div
-            style={{
-                background: '#fff',
-                borderRadius: 8,
-                height: 56,
-                display: 'flex',
-                alignItems: 'center',
-                padding: '0 12px',
-                gap: 12,
-                marginBottom: 24,
-                boxSizing: 'border-box',
-            }}
-        >
-            <div
-                style={{
-                    flex: 1,
-                    height: 32,
-                    background: '#F6F6F8',
-                    borderRadius: 8,
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '0 12px',
-                    gap: 8,
-                    minWidth: 0,
-                }}
-            >
+        <div style={{
+            background: isDark ? '#1f1f1f' : '#fff',
+            borderRadius: 8, height: 56, display: 'flex', alignItems: 'center',
+            padding: '0 12px', gap: 12, marginBottom: 24, boxSizing: 'border-box',
+        }}>
+            <div style={{
+                flex: 1, height: 32,
+                background: isDark ? '#2a2a2a' : '#F6F6F8',
+                borderRadius: 8, display: 'flex', alignItems: 'center',
+                padding: '0 12px', gap: 8, minWidth: 0,
+            }}>
                 <input
                     value={search}
                     onChange={e => onSearchChange(e.target.value)}
                     placeholder="Найти объявление..."
                     style={{
-                        flex: 1,
-                        border: 'none',
-                        background: 'transparent',
-                        outline: 'none',
-                        fontFamily: 'Roboto, sans-serif',
-                        fontWeight: 400,
-                        fontSize: 14,
-                        lineHeight: '22px',
-                        color: 'rgba(0,0,0,0.85)',
-                        minWidth: 0,
+                        flex: 1, border: 'none', background: 'transparent', outline: 'none',
+                        fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14, lineHeight: '22px',
+                        color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)', minWidth: 0,
                     }}
                 />
                 <SearchIcon />
             </div>
 
-            <div
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    background: '#F5F5F5',
-                    borderRadius: 8,
-                    padding: '1px',
-                    gap: 2,
-                    flexShrink: 0,
-                }}
-            >
+            <div style={{
+                display: 'flex', alignItems: 'center',
+                background: isDark ? '#2a2a2a' : '#F5F5F5',
+                borderRadius: 8, padding: '1px', gap: 2, flexShrink: 0,
+            }}>
                 <button
                     onClick={() => onLayoutChange('grid')}
-                    style={{
-                        width: 32, height: 32, border: 'none', borderRadius: 6,
-                        background: 'transparent', display: 'flex', alignItems: 'center',
-                        justifyContent: 'center', cursor: 'pointer', padding: 0,
-                    }}
+                    style={{ width: 32, height: 32, border: 'none', borderRadius: 6, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 }}
                     title="Сетка"
                 >
                     <img src={layout === 'grid' ? sectBlueUrl : sectBlackUrl} alt="grid" width={16} height={16} />
@@ -318,11 +257,7 @@ function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, on
                 <img src={separatorUrl} alt="" width={2} height={28} />
                 <button
                     onClick={() => onLayoutChange('list')}
-                    style={{
-                        width: 32, height: 32, border: 'none', borderRadius: 6,
-                        background: 'transparent', display: 'flex', alignItems: 'center',
-                        justifyContent: 'center', cursor: 'pointer', padding: 0,
-                    }}
+                    style={{ width: 32, height: 32, border: 'none', borderRadius: 6, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 }}
                     title="Список"
                 >
                     <img src={layout === 'list' ? listBlueUrl : listBlackUrl} alt="list" width={16} height={16} />
@@ -334,20 +269,13 @@ function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, on
                     value={sortValue}
                     onChange={e => onSortChange(e.target.value)}
                     style={{
-                        appearance: 'none',
-                        WebkitAppearance: 'none',
-                        background: '#FFFFFF',
-                        border: '4px solid #F4F4F6',
-                        borderRadius: 8,
-                        boxShadow: '0px 2px 0px rgba(0,0,0,0.016)',
-                        outline: 'none',
-                        fontFamily: 'Roboto, sans-serif',
-                        fontWeight: 400,
-                        fontSize: 14,
-                        color: 'rgba(0,0,0,0.85)',
-                        padding: '4px 36px 4px 16px',
-                        cursor: 'pointer',
-                        lineHeight: 'normal',
+                        appearance: 'none', WebkitAppearance: 'none',
+                        background: isDark ? '#2a2a2a' : '#FFFFFF',
+                        border: isDark ? '4px solid #303030' : '4px solid #F4F4F6',
+                        borderRadius: 8, outline: 'none',
+                        fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14,
+                        color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
+                        padding: '4px 36px 4px 16px', cursor: 'pointer', lineHeight: 'normal',
                     }}
                 >
                     <option value="createdAt_desc">По новизне (сначала новые)</option>
@@ -357,10 +285,7 @@ function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, on
                     <option value="price_asc">По цене (сначала дешевле)</option>
                     <option value="price_desc">По цене (сначала дороже)</option>
                 </select>
-                <svg
-                    width="12" height="12" viewBox="0 0 12 12" fill="none"
-                    style={{ position: 'absolute', right: 12, pointerEvents: 'none' }}
-                >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ position: 'absolute', right: 12, pointerEvents: 'none' }}>
                     <path d="M2 4l4 4 4-4" stroke="rgba(0,0,0,0.45)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
             </div>
@@ -370,52 +295,44 @@ function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, on
 
 //Ad Card (Grid)
 
-function AdCardGrid({ item, onClick }: { item: AdItem; onClick: () => void }) {
+function AdCardGrid({ item, onClick, isDark }: { item: AdItem; onClick: () => void; isDark: boolean }) {
     return (
         <div
             onClick={onClick}
             style={{
-                background: '#fff',
-                borderRadius: 16,
-                overflow: 'hidden',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                position: 'relative',
+                background: isDark ? '#1f1f1f' : '#fff',
+                borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', position: 'relative',
             }}
         >
-            <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#fff' }}>
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: isDark ? '#2a2a2a' : '#fff' }}>
                 <img
                     src={item.imageUrl ?? photoPlaceholder}
                     alt={item.title}
                     style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                 />
-                <div
-                    style={{
-                        position: 'absolute',
-                        bottom: -14,
-                        left: 16,
-                        background: '#fff',
-                        border: '1px solid #D9D9D9',
-                        borderRadius: 20,
-                        padding: '2px 10px',
-                        fontFamily: 'Roboto, sans-serif',
-                        fontWeight: 400,
-                        fontSize: 14,
-                        lineHeight: '22px',
-                        color: 'rgba(0,0,0,0.85)',
-                        whiteSpace: 'nowrap',
-                    }}
-                >
+                <div style={{
+                    position: 'absolute', bottom: -14, left: 16,
+                    background: isDark ? '#2a2a2a' : '#fff',
+                    border: isDark ? '1px solid #434343' : '1px solid #D9D9D9',
+                    borderRadius: 20, padding: '2px 10px',
+                    fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14, lineHeight: '22px',
+                    color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
+                    whiteSpace: 'nowrap',
+                }}>
                     {CATEGORY_LABELS[item.category]}
                 </div>
             </div>
 
             <div style={{ padding: '22px 16px 48px', display: 'flex', flexDirection: 'column', flex: 1, gap: 4 }}>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: 'rgba(0,0,0,0.85)', margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                <p style={{
+                    fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 16, lineHeight: '24px',
+                    color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
+                    margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                }}>
                     {item.title}
                 </p>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 14, lineHeight: '140%', color: 'rgba(0,0,0,0.45)', margin: 0 }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 14, lineHeight: '140%', color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)', margin: 0 }}>
                     {formatPrice(item.price)}
                 </p>
             </div>
@@ -431,35 +348,31 @@ function AdCardGrid({ item, onClick }: { item: AdItem; onClick: () => void }) {
 
 //Ad Card (List)
 
-function AdCardList({ item, onClick }: { item: AdItem; onClick: () => void }) {
+function AdCardList({ item, onClick, isDark }: { item: AdItem; onClick: () => void; isDark: boolean }) {
     return (
         <div
             onClick={onClick}
             style={{
-                background: '#fff',
-                borderRadius: 16,
-                overflow: 'hidden',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'stretch',
-                position: 'relative',
+                background: isDark ? '#1f1f1f' : '#fff',
+                borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
+                display: 'flex', alignItems: 'stretch', position: 'relative',
             }}
         >
-            <div style={{ width: 179, flexShrink: 0, background: '#fff' }}>
-                <img
-                    src={item.imageUrl ?? photoPlaceholder}
-                    alt={item.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-                />
+            <div style={{ width: 179, flexShrink: 0, background: isDark ? '#2a2a2a' : '#fff' }}>
+                <img src={item.imageUrl ?? photoPlaceholder} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
             </div>
             <div style={{ flex: 1, minWidth: 0, padding: '12px 16px 40px', display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 14, lineHeight: '22px', color: 'rgba(0,0,0,0.45)', margin: 0 }}>
                     {CATEGORY_LABELS[item.category]}
                 </p>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 16, lineHeight: '24px', color: 'rgba(0,0,0,0.85)', margin: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                <p style={{
+                    fontFamily: 'Roboto, sans-serif', fontWeight: 400, fontSize: 16, lineHeight: '24px',
+                    color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
+                    margin: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                }}>
                     {item.title}
                 </p>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 14, lineHeight: '140%', color: 'rgba(0,0,0,0.45)', margin: 0 }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 14, lineHeight: '140%', color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)', margin: 0 }}>
                     {formatPrice(item.price)}
                 </p>
             </div>
@@ -475,11 +388,12 @@ function AdCardList({ item, onClick }: { item: AdItem; onClick: () => void }) {
 
 //Pagination
 
-function Pagination({ current, total, onChange }: { current: number; total: number; onChange: (p: number) => void }) {
+function Pagination({ current, total, onChange, isDark }: { current: number; total: number; onChange: (p: number) => void; isDark: boolean }) {
     if (total <= 1) return null;
 
     const base: React.CSSProperties = {
-        width: 32, height: 32, borderRadius: 8, background: '#fff',
+        width: 32, height: 32, borderRadius: 8,
+        background: isDark ? '#1f1f1f' : '#fff',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         cursor: 'pointer', fontFamily: 'Roboto, sans-serif',
         fontSize: 14, boxSizing: 'border-box', flexShrink: 0,
@@ -490,10 +404,10 @@ function Pagination({ current, total, onChange }: { current: number; total: numb
             <button
                 onClick={() => current > 1 && onChange(current - 1)}
                 disabled={current <= 1}
-                style={{ ...base, border: '1px solid #D9D9D9', opacity: current <= 1 ? 0.4 : 1, cursor: current <= 1 ? 'default' : 'pointer' }}
+                style={{ ...base, border: isDark ? '1px solid #434343' : '1px solid #D9D9D9', opacity: current <= 1 ? 0.4 : 1, cursor: current <= 1 ? 'default' : 'pointer' }}
             >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M7.5 9.5L4 6l3.5-3.5" stroke="rgba(0,0,0,0.85)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M7.5 9.5L4 6l3.5-3.5" stroke={isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
             </button>
             {Array.from({ length: total }, (_, i) => i + 1).map(p => (
@@ -502,8 +416,8 @@ function Pagination({ current, total, onChange }: { current: number; total: numb
                     onClick={() => onChange(p)}
                     style={{
                         ...base,
-                        border: p === current ? '1px solid #1890FF' : '1px solid #D9D9D9',
-                        color: p === current ? '#1890FF' : 'rgba(0,0,0,0.85)',
+                        border: p === current ? '1px solid #1890FF' : isDark ? '1px solid #434343' : '1px solid #D9D9D9',
+                        color: p === current ? '#1890FF' : isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
                         fontWeight: p === current ? 500 : 400,
                     }}
                 >
@@ -513,10 +427,10 @@ function Pagination({ current, total, onChange }: { current: number; total: numb
             <button
                 onClick={() => current < total && onChange(current + 1)}
                 disabled={current >= total}
-                style={{ ...base, border: '1px solid #D9D9D9', opacity: current >= total ? 0.4 : 1, cursor: current >= total ? 'default' : 'pointer' }}
+                style={{ ...base, border: isDark ? '1px solid #434343' : '1px solid #D9D9D9', opacity: current >= total ? 0.4 : 1, cursor: current >= total ? 'default' : 'pointer' }}
             >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M4.5 2.5L8 6l-3.5 3.5" stroke="rgba(0,0,0,0.85)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M4.5 2.5L8 6l-3.5 3.5" stroke={isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
             </button>
         </div>
@@ -559,13 +473,8 @@ export default function AdsListPage() {
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const fetchItems = useCallback(async (opts: {
-        q: string;
-        sortCol: SortColumn;
-        sortDir: SortDirection;
-        categories: Category[];
-        needsRevision: boolean;
-        page: number;
-        priceSort: 'asc' | 'desc' | null;
+        q: string; sortCol: SortColumn; sortDir: SortDirection;
+        categories: Category[]; needsRevision: boolean; page: number; priceSort: 'asc' | 'desc' | null;
     }) => {
         abortRef.current?.abort();
         abortRef.current = new AbortController();
@@ -601,20 +510,10 @@ export default function AdsListPage() {
     }, []);
 
     useEffect(() => {
-        // Показываем загрузку сразу — до того как сработает debounce
         setLoading(true);
-
         if (timerRef.current) clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
-            fetchItems({
-                q: search,
-                sortCol: sortColumn,
-                sortDir: sortDirection,
-                categories: selectedCategories,
-                needsRevision: onlyNeedsRevision,
-                page,
-                priceSort: priceSortDir,
-            });
+            fetchItems({ q: search, sortCol: sortColumn, sortDir: sortDirection, categories: selectedCategories, needsRevision: onlyNeedsRevision, page, priceSort: priceSortDir });
         }, 300);
         return () => { if (timerRef.current) clearTimeout(timerRef.current); };
     }, [search, sortColumn, sortDirection, priceSortDir, selectedCategories, onlyNeedsRevision, page, fetchItems]);
@@ -650,9 +549,7 @@ export default function AdsListPage() {
     };
 
     const handleCategoryToggle = (cat: Category) => {
-        setSelectedCategories(prev =>
-            prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
-        );
+        setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
         setPage(1);
     };
 
@@ -668,34 +565,20 @@ export default function AdsListPage() {
     const allSorted = priceSortDir
         ? [...items].sort((a, b) => priceSortDir === 'asc' ? a.price - b.price : b.price - a.price)
         : items;
-    const displayItems = priceSortDir
-        ? allSorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-        : allSorted;
-    const totalPages = priceSortDir
-        ? Math.max(1, Math.ceil(items.length / PAGE_SIZE))
-        : Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const displayItems = priceSortDir ? allSorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) : allSorted;
+    const totalPages = priceSortDir ? Math.max(1, Math.ceil(items.length / PAGE_SIZE)) : Math.max(1, Math.ceil(total / PAGE_SIZE));
 
     return (
-        <div
-            style={{
-                minHeight: '100vh',
-                background: isDark ? '#141414' : '#F7F5F8',
-                boxSizing: 'border-box',
-                fontFamily: 'Roboto, sans-serif',
-            }}
-        >
+        <div style={{
+            minHeight: '100vh',
+            background: isDark ? '#141414' : '#F7F5F8',
+            boxSizing: 'border-box',
+            fontFamily: 'Roboto, sans-serif',
+        }}>
             <ThemeToggle />
-            <div
-                style={{
-                    maxWidth: 1440,
-                    minWidth: 1024,
-                    margin: '0 auto',
-                    padding: '24px 42px 40px',
-                    boxSizing: 'border-box',
-                }}
-            >
+            <div style={{ maxWidth: 1440, minWidth: 1024, margin: '0 auto', padding: '24px 42px 40px', boxSizing: 'border-box' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 16 }}>
-                    <h1 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 24, lineHeight: '32px', color: 'rgba(0,0,0,0.85)', margin: 0 }}>
+                    <h1 style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 24, lineHeight: '32px', color: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)', margin: 0 }}>
                         Мои объявления
                     </h1>
                     {!loading && total > 0 && (
@@ -712,6 +595,7 @@ export default function AdsListPage() {
                     onSortChange={handleSortChange}
                     layout={layout}
                     onLayoutChange={handleLayoutChange}
+                    isDark={isDark}
                 />
 
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24 }}>
@@ -721,29 +605,24 @@ export default function AdsListPage() {
                         onlyNeedsRevision={onlyNeedsRevision}
                         onNeedsRevisionToggle={v => { setOnlyNeedsRevision(v); setPage(1); }}
                         onReset={handleReset}
+                        isDark={isDark}
                     />
 
                     <div style={{ flex: 1, minWidth: 0 }}>
                         {loading && (
-                            <p style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(0,0,0,0.45)', fontSize: 14 }}>Загрузка...</p>
+                            <p style={{ textAlign: 'center', padding: '60px 0', color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)', fontSize: 14 }}>Загрузка...</p>
                         )}
                         {error && !loading && (
                             <p style={{ textAlign: 'center', padding: '60px 0', color: '#ff4d4f', fontSize: 14 }}>{error}</p>
                         )}
                         {!loading && !error && displayItems.length === 0 && (
-                            <p style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(0,0,0,0.45)', fontSize: 14 }}>Объявления не найдены</p>
+                            <p style={{ textAlign: 'center', padding: '60px 0', color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)', fontSize: 14 }}>Объявления не найдены</p>
                         )}
 
                         {!loading && !error && displayItems.length > 0 && layout === 'grid' && (
-                            <div
-                                style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-                                    gap: 16,
-                                }}
-                            >
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 16 }}>
                                 {displayItems.map(item => (
-                                    <AdCardGrid key={item.id} item={item} onClick={() => navigate(`/ads/${item.id}`)} />
+                                    <AdCardGrid key={item.id} item={item} onClick={() => navigate(`/ads/${item.id}`)} isDark={isDark} />
                                 ))}
                             </div>
                         )}
@@ -751,12 +630,12 @@ export default function AdsListPage() {
                         {!loading && !error && displayItems.length > 0 && layout === 'list' && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                                 {displayItems.map(item => (
-                                    <AdCardList key={item.id} item={item} onClick={() => navigate(`/ads/${item.id}`)} />
+                                    <AdCardList key={item.id} item={item} onClick={() => navigate(`/ads/${item.id}`)} isDark={isDark} />
                                 ))}
                             </div>
                         )}
 
-                        {!loading && !error && <Pagination current={page} total={totalPages} onChange={setPage} />}
+                        {!loading && !error && <Pagination current={page} total={totalPages} onChange={setPage} isDark={isDark} />}
                     </div>
                 </div>
             </div>

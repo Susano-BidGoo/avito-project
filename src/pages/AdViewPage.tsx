@@ -242,7 +242,7 @@ export default function AdViewPage() {
         return (
             <div style={{ ...pageWrapStyle, background: isDark ? '#141414' : '#FFFFFF' }}>
                 <ThemeToggle />
-                <p style={{ textAlign: 'center', padding: '80px 0', color: 'rgba(0,0,0,0.45)', fontSize: 14, fontFamily: 'Roboto, sans-serif' }}>
+                <p style={{ textAlign: 'center', padding: '80px 0', color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)', fontSize: 14, fontFamily: 'Roboto, sans-serif' }}>
                     Загрузка...
                 </p>
             </div>
@@ -402,7 +402,7 @@ export default function AdViewPage() {
                                     {item.description}
                                 </p>
                             ) : (
-                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: 'rgba(0,0,0,0.35)', margin: 0, fontStyle: 'italic' }}>
+                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', margin: 0, fontStyle: 'italic' }}>
                                     Отсутствует
                                 </p>
                             )}
@@ -415,7 +415,7 @@ export default function AdViewPage() {
                         {/* Плашка "Требуются доработки" */}
                         {missingFields.length > 0 && (
                             <div style={{
-                                background: '#F9F1E6',
+                                background: isDark ? '#2D2000' : '#F9F1E6',
                                 borderRadius: 12,
                                 padding: '16px 20px',
                                 maxWidth: 460,
@@ -428,7 +428,7 @@ export default function AdViewPage() {
                                         fontWeight: 600,
                                         fontSize: 16,
                                         lineHeight: '24px',
-                                        color: '#1E1E1E',
+                                        color: isDark ? '#FFD666' : '#1E1E1E',
                                     }}>
                                         Требуются доработки
                                     </span>
@@ -438,7 +438,7 @@ export default function AdViewPage() {
                                     fontWeight: 400,
                                     fontSize: 14,
                                     lineHeight: '22px',
-                                    color: 'rgba(0,0,0,0.85)',
+                                    color: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.85)',
                                     margin: '0 0 8px 0',
                                 }}>
                                     У объявления не заполнены следующие поля:
@@ -450,7 +450,7 @@ export default function AdViewPage() {
                                             fontWeight: 400,
                                             fontSize: 14,
                                             lineHeight: '22px',
-                                            color: 'rgba(0,0,0,0.85)',
+                                            color: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.85)',
                                         }}>
                                             {f}
                                         </li>
