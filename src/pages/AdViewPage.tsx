@@ -4,7 +4,7 @@ import photoPlaceholder from '../assets/photo view.svg';
 import warningIcon from '../assets/Warning sign.svg';
 import editIconUrl from '../assets/Edit icon.svg';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+//Types
 
 type Category = 'auto' | 'real_estate' | 'electronics';
 
@@ -46,9 +46,9 @@ interface AdItem {
     params?: AutoParams | RealEstateParams | ElectronicsParams;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+//Constants
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = '/api';
 
 const CATEGORY_LABELS: Record<Category, string> = {
     auto: 'Авто',
@@ -78,7 +78,7 @@ const CONDITION_LABELS: Record<string, string> = {
     used: 'Б/у',
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//Helpers
 
 function formatPrice(price: number): string {
     return `${price} ₽`
@@ -125,7 +125,7 @@ function getMissingFields(item: AdItem): string[] {
     return missing;
 }
 
-// ─── Characteristics ──────────────────────────────────────────────────────────
+//Characteristics
 
 function CharacteristicsBlock({ item }: { item: AdItem }) {
     const rows: { label: string; value: string }[] = [];
@@ -197,8 +197,7 @@ function CharacteristicsBlock({ item }: { item: AdItem }) {
     );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
+//Page
 export default function AdViewPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -210,6 +209,7 @@ export default function AdViewPage() {
     useEffect(() => {
         if (!id) return;
         const controller = new AbortController();
+// eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         setError(null);
         setItem(null);
@@ -267,7 +267,7 @@ export default function AdViewPage() {
         <div style={pageWrapStyle}>
             <div style={innerStyle}>
 
-                {/* ── Верхняя полоса: Название | Цена ──────────────────────────── */}
+                {/*Название Цена */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'flex-start',
@@ -275,7 +275,7 @@ export default function AdViewPage() {
                     gap: 24,
                     paddingBottom: 20,
                 }}>
-                    {/* Левая часть: название + кнопка */}
+                    {/*название + кнопка */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         <h1 style={{
                             fontFamily: 'Roboto, sans-serif',
@@ -289,7 +289,7 @@ export default function AdViewPage() {
                             {item.title}
                         </h1>
 
-                        {/* Кнопка "Редактировать" — иконка белая, фон синий */}
+                        {/* Кнопка "Редактировать" */}
                         <button
                             onClick={() => navigate(`/ads/${id}/edit`)}
                             style={{
@@ -314,7 +314,7 @@ export default function AdViewPage() {
                         </button>
                     </div>
 
-                    {/* Правая часть: цена + даты */}
+                    {/* цена  даты */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
                         <p style={{
                             fontFamily: 'Roboto, sans-serif',
@@ -337,13 +337,13 @@ export default function AdViewPage() {
                     </div>
                 </div>
 
-                {/* ── Разделитель #F0F0F0 ───────────────────────────────────────── */}
+                {/*Разделитель*/}
                 <div style={{ height: 1, background: '#F0F0F0', marginBottom: 24 }} />
 
-                {/* ── Основной контент ──────────────────────────────────────────── */}
+                {/*Основной контент*/}
                 <div style={{ display: 'flex', gap: 0, alignItems: 'flex-start' }}>
 
-                    {/* Левая колонка: фото + описание */}
+                    {/*фото + описание*/}
                     <div style={{ width: 480, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
 
                         {/* Фото */}
@@ -395,7 +395,7 @@ export default function AdViewPage() {
                         </div>
                     </div>
 
-                    {/* Правая колонка: плашка доработок + характеристики */}
+                    {/*плашка доработок + характеристики */}
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 20 }}>
 
                         {/* Плашка "Требуются доработки" */}
@@ -445,7 +445,7 @@ export default function AdViewPage() {
                             </div>
                         )}
 
-                        {/* Характеристики — без плашки, без разделителей */}
+                        {/* Характеристики*/}
                         <CharacteristicsBlock item={item} />
                     </div>
                 </div>
@@ -454,7 +454,7 @@ export default function AdViewPage() {
     );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
+//Styles
 
 const pageWrapStyle: React.CSSProperties = {
     minHeight: '100vh',

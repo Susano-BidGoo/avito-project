@@ -9,6 +9,7 @@ import listBlueUrl from '../assets/List blue.svg';
 import tickUrl from '../assets/Tick.svg';
 import blankCheckmarkUrl from '../assets/Blank checkmark.svg';
 import requiresImprovementsUrl from '../assets/Requires improvements.svg';
+import separatorUrl from '../assets/Separator.svg';
 
 //Types
 
@@ -42,7 +43,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
 
 const ALL_CATEGORIES: Category[] = ['auto', 'real_estate', 'electronics'];
 const PAGE_SIZE = 10;
-const API_BASE = 'http://localhost:8080';
+const API_BASE = '/api';
 const LAYOUT_KEY = 'ads_layout';
 
 function formatPrice(price: number): string {
@@ -290,15 +291,13 @@ function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, on
                 <SearchIcon />
             </div>
 
-            <div style={{ width: 1, height: 24, background: '#F0F0F0', flexShrink: 0 }} />
-
             <div
                 style={{
                     display: 'flex',
                     alignItems: 'center',
                     background: '#F5F5F5',
                     borderRadius: 8,
-                    padding: '4px',
+                    padding: '1px',
                     gap: 2,
                     flexShrink: 0,
                 }}
@@ -314,7 +313,7 @@ function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, on
                 >
                     <img src={layout === 'grid' ? sectBlueUrl : sectBlackUrl} alt="grid" width={16} height={16} />
                 </button>
-                <div style={{ width: 1, height: 16, background: '#D9D9D9' }} />
+                <img src={separatorUrl} alt="" width={2} height={28} />
                 <button
                     onClick={() => onLayoutChange('list')}
                     style={{
@@ -327,8 +326,6 @@ function SearchBar({ search, onSearchChange, sortValue, onSortChange, layout, on
                     <img src={layout === 'list' ? listBlueUrl : listBlackUrl} alt="list" width={16} height={16} />
                 </button>
             </div>
-
-            <div style={{ width: 1, height: 24, background: '#F0F0F0', flexShrink: 0 }} />
 
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                 <select
@@ -536,12 +533,12 @@ export default function AdsListPage() {
     const [error, setError] = useState<string | null>(null);
 
     const [search, setSearch] = useState(searchParams.get('q') ?? '');
-    const [sortColumn, setSortColumn] = useState<SortColumn>('createdAt');
-    const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-    const [priceSortDir, setPriceSortDir] = useState<'asc' | 'desc' | null>(null);
-    const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
-    const [onlyNeedsRevision, setOnlyNeedsRevision] = useState(false);
-    const [page, setPage] = useState(1);
+    const [sortColumn, setSortColumn] = useState<SortColumn>((searchParams.get('sortColumn') as SortColumn) ?? 'createdAt');
+    const [sortDirection, setSortDirection] = useState<SortDirection>((searchParams.get('sortDirection') as SortDirection) ?? 'desc');
+    const [priceSortDir, setPriceSortDir] = useState<'asc' | 'desc' | null>((searchParams.get('priceSort') as 'asc' | 'desc') ?? null);
+    const [selectedCategories, setSelectedCategories] = useState<Category[]>(searchParams.get('categories') ? searchParams.get('categories')!.split(',') as Category[] : []);
+    const [onlyNeedsRevision, setOnlyNeedsRevision] = useState(searchParams.get('needsRevision') === 'true');
+    const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
 
     const [layout, setLayout] = useState<Layout>(() => {
         const saved = localStorage.getItem(LAYOUT_KEY);
@@ -621,8 +618,13 @@ export default function AdsListPage() {
         const p: Record<string, string> = {};
         if (search) p.q = search;
         if (page > 1) p.page = String(page);
+        if (sortColumn !== 'createdAt') p.sortColumn = sortColumn;
+        if (sortDirection !== 'desc') p.sortDirection = sortDirection;
+        if (priceSortDir) p.priceSort = priceSortDir;
+        if (selectedCategories.length) p.categories = selectedCategories.join(',');
+        if (onlyNeedsRevision) p.needsRevision = 'true';
         setSearchParams(p, { replace: true });
-    }, [search, page, setSearchParams]);
+    }, [search, page, sortColumn, sortDirection, priceSortDir, selectedCategories, onlyNeedsRevision, setSearchParams]);
 
     useEffect(() => () => abortRef.current?.abort(), []);
 
@@ -653,9 +655,6 @@ export default function AdsListPage() {
         setSearch('');
         setSelectedCategories([]);
         setOnlyNeedsRevision(false);
-        setSortColumn('createdAt');
-        setSortDirection('desc');
-        setPriceSortDir(null);
         setPage(1);
     };
 
