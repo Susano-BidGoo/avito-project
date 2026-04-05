@@ -1,73 +1,92 @@
-# React + TypeScript + Vite
+Веб-приложение — личный кабинет продавца с AI-ассистентом для улучшения объявлений.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Требования
 
-Currently, two official plugins are available:
+[Node.js v20+](https://nodejs.org/)
+[Ollama](https://ollama.com/) — для AI-функций
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Установка и запуск
 
-## React Compiler
+1. Клонировать репозиторий
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
+git clone https://github.com/Susano-BidGoo/avito-project.git
+cd avito-project
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. Запустить сервер
+cd server
+npm install
+npm start
+или
+cd server
+yarn install
+yarn start
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Сервер запустится на `http://localhost:8080`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Если `yarn` не установлен или заблокирован в Windows — выполни в PowerShell от имени администратора:
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+npm install -g yarn
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+3. Запустить клиент
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Открыть новый терминал:
+cd avito-project
+npm install
+npm run dev
+или
+cd avito-project
+yarn install
+yarn dev
+
+Приложение откроется на `http://localhost:5173`
+Настройка AI (Ollama)
+AI-функции — «Придумать описание», «Улучшить описание», «Узнать рыночную цену» — работают через локальную модель Ollama.
+
+1. Установить Ollama
+Скачать с [ollama.com](https://ollama.com/) и установить.
+
+2. Загрузить модель
+ollama pull llama3
+
+3. Запустить Ollama
+ollama serve
+
+Ollama будет доступна на `http://localhost:11434`
+
+Без запущенной Ollama кнопки AI будут показывать ошибку — остальной функционал приложения работает независимо.
+Структура проекта
+
+
+├── avito-project/          # React-приложение (frontend)
+│   ├── src/
+│   │   ├── pages/   # Страницы приложения
+│   │   ├── context/ # ThemeContext (тёмная тема)
+│   │   └── assets/  # Иконки и изображения
+│   └── ...
+└── server/          # Backend (Fastify)
+    ├── server.ts
+    └── ...
+
+Функциональность
+
+Список объявлений с поиском, сортировкой, фильтрами и пагинацией
+Переключение лейаута: сетка / список
+Просмотр объявления с характеристиками и блоком доработок
+Редактирование объявления с сохранением черновика в `localStorage`
+AI-ассистент: генерация и улучшение описания, оценка рыночной цены
+Тёмная/светлая тема с сохранением в `localStorage`
+
+Принятые решения
+
+Сортировка по цене реализована на клиенте, так как API не поддерживает этот параметр
+Исправлен баг в сервере: `process.env.port` → `process.env.PORT`, из-за которой сервер не запускался без явного указания порта
+Исправлен баг в сервере: в `GET /items` не возвращалось поле `id`, из-за чего переход на страницу объявления был невозможен
+Сортировка по цене реализована на клиенте, так как API не поддерживает этот параметр
+Лейаут (сетка/список) сохраняется в `localStorage` и не сбрасывается при навигации
+Тёмная тема реализована через CSS-переменные и атрибут `data-theme` на `<html>`, выбор сохраняется в `localStorage`
+Отмена запросов через `AbortController` при переходе между страницами
+
